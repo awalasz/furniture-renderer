@@ -1,7 +1,12 @@
 from pydantic import BaseModel, Extra
-from typing import List, Literal
+from typing import List
+from enum import Enum
 
-PlaneChoices = Literal['XY', 'YZ', 'XZ']
+
+class PlaneChoices(Enum):
+    XY = 'XY'
+    YZ = 'YZ'
+    XZ = 'XZ'
 
 
 class Geometry(BaseModel, extra=Extra.forbid):
