@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Extra
 from typing import List, Literal
 
+PlaneChoices = Literal['XY', 'YZ', 'XZ']
+
 
 class Geometry(BaseModel, extra=Extra.forbid):
     x1: int
@@ -13,4 +15,4 @@ class Geometry(BaseModel, extra=Extra.forbid):
 
 class Body(BaseModel, extra=Extra.forbid):
     geometry: List[Geometry]
-    projection_plane: Literal['XY', 'YZ', 'XZ']
+    projection_plane: PlaneChoices

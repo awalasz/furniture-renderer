@@ -17,3 +17,9 @@ def test_body(original_example_input):
     assert parsed.projection_plane == "XY"
     assert len(parsed.geometry) == 13
     assert all(isinstance(g, Geometry) for g in parsed.geometry)
+
+
+def test_invalid_plane(original_example_input):
+    original_example_input["projection_plane"] = "Foo"
+    with pytest.raises(ValueError):
+        Body.parse_obj(original_example_input)
