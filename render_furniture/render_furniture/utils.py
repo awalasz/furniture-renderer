@@ -25,25 +25,39 @@ class Render(ABC):
         pass
 
 
+def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
+    """Methods returns the objects in order from the closest to the farest one, according to the selected plane.
+
+    Note: that opposite plane (if implemented) cannot just reverse the order because of that There is no restriction
+    to that x1 should be closer than x2 therefore this methods takes "max" of them (or "min" for the opposite planes),
+    to determine a distance to the "camera point".
+
+    TODO:
+        ---- (A.X1 = -3) ------ (A.X2 = -1) --- |0| ------ (B.X2 = 2) --- (B.X1 = 1) ----------> X  [Camera point]
+    TODO: On plane "XZ" the closest is B.X1 or A.X1? This is not exactly determined. I assumed, that camera is at -> end
+
+    :param geometry: List of Geometry objects to be sorted
+    :param plane:
+    :return:
+    """
+    sort_method = {
+        'XY': lambda g: max(g.z1, g.z2),
+        'YZ': lambda g: max(g.x1, g.x2),
+        'XZ': lambda g: max(g.y1, g.y2),
+        # '-XY': lambda g: min(g.z1, g.z2),
+        # '-YZ': lambda g: min(g.x1, g.x2),
+        # '-XZ': lambda g: min(g.y1, g.y2),
+    }.get(plane.value())
+
+    return sorted(geometry, key=sort_method)
+
+
 class RenderSVG(Render):
 
     def __init__(self, data: Body):
         self.plane = data.projection_plane
         self.geometry = data.geometry
 
-    def render(self, plane: PlaneChoices, geometry: List[Geometry],  *args, **kwargs):
-        print(plane, geometry)
-        print(self._sorted_geometries())
-
-    def _sorted_geometries(self) -> List[Geometry]:
-        # todo - check in example which of 1/2 indexes are "closer"
-        sort_method = {
-            'XY': lambda g: min(g.z1, g.z2),
-            'YZ': lambda g: min(g.x1, g.x2),
-            'XZ': lambda g: min(g.y1, g.y2),
-            # '-XY': lambda g: max(g.z1, g.z2),
-            # '-YZ': lambda g: max(g.x1, g.x2),
-            # '-XZ': lambda g: max(g.y1, g.y2),
-        }.get(self.plane)
-
-        return sorted(self.geometry, key=sort_method)
+    def render(self, *args, **kwargs):
+        print(self.plane, self.geometry)
+        print(sorted_geometries(geometry=self.geometry, plane=self.plane))
