@@ -80,8 +80,13 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     )
 
 
+def sorted_rectangles(rectangles: List[Rectangle]) -> List[Rectangle]:
+    """Method returns sorted list of rectangles in order from closest to the further one, based on it's height"""
+    return sorted(rectangles, key=lambda r: r.height, reverse=True)
+
+
 def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
-    """Methods returns geometries in order from the closest to the further one, according to the selected plane.
+    """Method returns geometries in order from the closest to the further one, according to the selected plane.
 
     Note: that opposite plane (if implemented) cannot just reverse the order because of that There is no restriction
     to that x1 should be closer than x2 therefore this methods takes "max" of them (or "min" for the opposite planes),
