@@ -28,13 +28,13 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     """ TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
                negative and positive values on axis. I will handle this at the end. For now i just use axis values.
 
-                 ^ Y
-                 |
-                 |
-                 |_____________> X
-                /
-               /
-              V Z
+                 ^ Y                                ^ Y
+                 |   123                      321   |
+                 |   456  789            987  654   |
+                 |_____________> X  -X <____________|
+                /                                  /
+               /                                  /
+              V Z                                V Z
 
     :param geometry: Geometry object to be casted to flat rectangle with height property
     :param plane: plane to which geometry will be casted
