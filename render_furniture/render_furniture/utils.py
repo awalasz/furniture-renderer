@@ -53,8 +53,19 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
 
 
 def remove_shadowed_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
-    output = geometry[:]  # works on copy to not pop from the original one
-    return output
+    # todo. To many if-else here. I should cast 3d geometry to rectangle & depth first,
+    #       which are independent from planes.
+    raise NotImplemented()
+
+    # sorted_geometry = sorted_geometries(geometry, plane)
+    # # TODO - i was thinking to use functools.reduce, but it's not the case
+    # closest = sorted_geometry[0]
+    # for next_geometry in sorted_geometry[1:]:
+    #     if all(
+    #         next_geometry
+    #     ):
+    #
+    # return output
 
 
 class RenderSVG(Render):
