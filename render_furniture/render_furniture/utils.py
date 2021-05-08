@@ -47,9 +47,9 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
         # '-XY': lambda g: min(g.z1, g.z2),
         # '-YZ': lambda g: min(g.x1, g.x2),
         # '-XZ': lambda g: min(g.y1, g.y2),
-    }.get(plane.value())
+    }.get(plane.value)
 
-    return sorted(geometry, key=sort_method)
+    return sorted(geometry, key=sort_method, reverse=True)
 
 
 class RenderSVG(Render):
