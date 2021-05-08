@@ -56,7 +56,7 @@ def test_sort_returns_new_list():
     assert new_list == [c, b, a]
 
 
-def test_sort_rectangles_():
+def test_sort_rectangles():
     a = Geometry(x1=1, x2=2, y1=1, y2=2, z1=1, z2=2)
     b = Geometry(x1=11, x2=12, y1=1, y2=2, z1=1, z2=2)
     c = Geometry(x1=21, x2=22, y1=1, y2=2, z1=1, z2=2)

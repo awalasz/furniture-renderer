@@ -112,10 +112,22 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
     return sorted(geometry, key=sort_method, reverse=True)
 
 
-def remove_shadowed_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
-    # todo. To many if-else here. I should cast 3d geometry to rectangle & depth first,
-    #       which are independent from planes.
-    raise NotImplemented()
+def is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
+    """returns True if top_rect fully shadows bottom_rect"""
+    # sanity check:
+    if not top_rect.height > bottom_rect.height:
+        return False
+
+    return all((
+        top_rect.left <= bottom_rect.left <= top_rect.right,
+        top_rect.left <= bottom_rect.right <= top_rect.right,
+        top_rect.bottom <= bottom_rect.bottom <= top_rect.top,
+        top_rect.bottom <= bottom_rect.top <= top_rect.top
+    ))
+
+
+def remove_shadowed_geometries(rectangles: List[Rectangle]) -> List[Rectangle]:
+    sorted_rects = sorted_rectangles(rectangles) #  returns copy of list. It's safe to pop form new list - TODO: TEST IT
 
     # sorted_geometry = sorted_geometries(geometry, plane)
     # # TODO - i was thinking to use functools.reduce, but it's not the case
@@ -124,8 +136,7 @@ def remove_shadowed_geometries(geometry: List[Geometry], plane: PlaneChoices) ->
     #     if all(
     #         next_geometry
     #     ):
-    #
-    # return output
+    return sorted_rects
 
 
 class RenderSVG(Render):
