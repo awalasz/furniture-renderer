@@ -25,3 +25,12 @@ class Geometry(BaseModel, extra=Extra.forbid):
 class Body(BaseModel, extra=Extra.forbid):
     geometry: List[Geometry]
     projection_plane: PlaneChoices
+
+
+class Rectangle(BaseModel):
+    x1: int
+    x2: int
+    y1: int
+    y2: int
+
+    height: int

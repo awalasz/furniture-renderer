@@ -15,14 +15,62 @@ temp file. I will probably reorganize this code later.
 from abc import ABC, abstractmethod
 from typing import List
 
-from render_furniture.render_furniture.schemas import Body, Geometry, PlaneChoices
+from render_furniture.render_furniture.schemas import Body, Geometry, PlaneChoices, Rectangle
 
 
 class Render(ABC):
-
     @abstractmethod
     def render(self, *args, **kwargs):
         pass
+
+
+def geometry2rectangle(g: Geometry, plane: PlaneChoices) -> Rectangle:
+    """ TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
+               negative and positive values on axis. I will handle this at the end. For now i just use axis values.
+
+        TODO 2 - for "rev" planes left is also opposite to right! up, down and height properties should not be touched.
+
+                 ^ Y
+                 |
+                 |
+                 |_____________> X
+                /
+               /
+              V Z
+
+    :param g: Geometry object to be casted to flat rectangle with height property
+    :param plane: plane to which geometry will be casted
+    :return: "flat" Rectangle object with height property
+    """
+    if plane in [PlaneChoices.XY, PlaneChoices.XY_rev]:
+        height = -min(g.z1, g.z2) if 'rev' in plane.nanme else max(g.z1, g.z2)
+        return Rectangle(
+            x1=g.x1,
+            x2=g.x2,
+            y1=g.y1,
+            y2=g.y2,
+            height=height,
+        )
+    elif plane in [PlaneChoices.YZ, PlaneChoices.YZ_rev]:
+        height = -min(g.x1, g.x2) if 'rev' in plane.nanme else max(g.x1, g.x2)
+        return Rectangle(
+            x1=g.y1,
+            x2=g.y2,
+            y1=g.z1,
+            y2=g.z2,
+            height=height,
+        )
+    elif plane in [PlaneChoices.XZ, PlaneChoices.XZ_rev]:
+        height = -min(g.y1, g.y2) if 'rev' in plane.nanme else max(g.y1, g.y2)
+        return Rectangle(
+            x1=g.x1,
+            x2=g.x2,
+            y1=g.z1,
+            y2=g.z2,
+            height=height,
+        )
+    else:
+        raise ValueError(f"Unknown plane: {plane}")
 
 
 def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
@@ -41,12 +89,12 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
     :return: new list of sorted geometries
     """
     sort_method = {
-        'XY': lambda g: max(g.z1, g.z2),
-        'YZ': lambda g: max(g.x1, g.x2),
-        'XZ': lambda g: max(g.y1, g.y2),
-        '-XY': lambda g: -min(g.z1, g.z2),
-        '-YZ': lambda g: -min(g.x1, g.x2),
-        '-XZ': lambda g: -min(g.y1, g.y2),
+        "XY": lambda g: max(g.z1, g.z2),
+        "YZ": lambda g: max(g.x1, g.x2),
+        "XZ": lambda g: max(g.y1, g.y2),
+        "-XY": lambda g: -min(g.z1, g.z2),
+        "-YZ": lambda g: -min(g.x1, g.x2),
+        "-XZ": lambda g: -min(g.y1, g.y2),
     }.get(plane.value)
 
     return sorted(geometry, key=sort_method, reverse=True)
@@ -69,7 +117,6 @@ def remove_shadowed_geometries(geometry: List[Geometry], plane: PlaneChoices) ->
 
 
 class RenderSVG(Render):
-
     def __init__(self, data: Body):
         self.plane = data.projection_plane
         self.geometry = data.geometry
