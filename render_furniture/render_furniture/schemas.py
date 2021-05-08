@@ -8,6 +8,10 @@ class PlaneChoices(Enum):
     YZ = 'YZ'
     XZ = 'XZ'
 
+    XY_rev = '-XY'
+    YZ_rev = '-YZ'
+    XZ_rev = '-XZ'
+
 
 class Geometry(BaseModel, extra=Extra.forbid):
     x1: int

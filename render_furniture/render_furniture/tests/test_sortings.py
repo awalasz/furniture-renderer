@@ -25,3 +25,16 @@ def test_sorting(plane, expected_closest, expected_farest):
     print(s)
     assert s[0] == expected_closest
     assert s[-1] == expected_farest
+
+
+def test_sorting_surface():
+    """
+    --- ax1 - bx1 - ax2 - bx2 ---> X
+    """
+    ga = Geometry(x1=1, x2=3, y1=-1, y2=1, z1=-1, z2=1)
+    gb = Geometry(x1=2, x2=4, y1=-1, y2=1, z1=-1, z2=1)
+    s = sorted_geometries(geometry=[ga, gb], plane=PlaneChoices.YZ)
+    assert s == [gb, ga]
+    rev_s = sorted_geometries(geometry=[ga, gb], plane=PlaneChoices.YZ_rev)
+    assert rev_s == [ga, gb]
+

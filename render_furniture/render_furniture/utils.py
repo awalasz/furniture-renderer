@@ -44,9 +44,9 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
         'XY': lambda g: max(g.z1, g.z2),
         'YZ': lambda g: max(g.x1, g.x2),
         'XZ': lambda g: max(g.y1, g.y2),
-        # '-XY': lambda g: min(g.z1, g.z2),
-        # '-YZ': lambda g: min(g.x1, g.x2),
-        # '-XZ': lambda g: min(g.y1, g.y2),
+        '-XY': lambda g: -min(g.z1, g.z2),
+        '-YZ': lambda g: -min(g.x1, g.x2),
+        '-XZ': lambda g: -min(g.y1, g.y2),
     }.get(plane.value)
 
     return sorted(geometry, key=sort_method, reverse=True)
