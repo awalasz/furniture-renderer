@@ -36,7 +36,21 @@ def test_sorting_surface():
     ga = Geometry(x1=0, x2=4, y1=-1, y2=1, z1=-1, z2=1)
     gb = Geometry(x1=2, x2=5, y1=-1, y2=1, z1=-1, z2=1)
     gc = Geometry(x1=3, x2=1, y1=-1, y2=1, z1=-1, z2=1)
+
     s = sorted_geometries(geometry=[ga, gb, gc], plane=PlaneChoices.YZ)
     assert s == [gb, ga, gc]
+
     rev_s = sorted_geometries(geometry=[ga, gb, gc], plane=PlaneChoices.YZ_rev)
     assert rev_s == [ga, gc, gb]
+
+
+def test_sort_returns_new_list():
+    a = Geometry(x1=1, x2=2, y1=1, y2=2, z1=1, z2=2)
+    b = Geometry(x1=11, x2=12, y1=1, y2=2, z1=1, z2=2)
+    c = Geometry(x1=21, x2=22, y1=1, y2=2, z1=1, z2=2)
+
+    original_list = [b, a, c]
+    new_list = sorted_geometries(geometry=original_list, plane=PlaneChoices.YZ)
+
+    assert original_list != new_list
+    assert new_list == [c, b, a]

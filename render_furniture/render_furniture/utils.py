@@ -26,7 +26,7 @@ class Render(ABC):
 
 
 def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
-    """Methods returns the objects in order from the closest to the farest one, according to the selected plane.
+    """Methods returns geometries in order from the closest to the further one, according to the selected plane.
 
     Note: that opposite plane (if implemented) cannot just reverse the order because of that There is no restriction
     to that x1 should be closer than x2 therefore this methods takes "max" of them (or "min" for the opposite planes),
@@ -37,8 +37,8 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
     TODO: On plane "XZ" the closest is B.X1 or A.X1? This is not exactly determined. I assumed, that camera is at -> end
 
     :param geometry: List of Geometry objects to be sorted
-    :param plane:
-    :return:
+    :param plane: XY / YZ / XZ / -XY / -YZ / -XZ
+    :return: new list of sorted geometries
     """
     sort_method = {
         'XY': lambda g: max(g.z1, g.z2),
@@ -50,6 +50,11 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
     }.get(plane.value)
 
     return sorted(geometry, key=sort_method, reverse=True)
+
+
+def remove_shadowed_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
+    output = geometry[:]  # works on copy to not pop from the original one
+    return output
 
 
 class RenderSVG(Render):
