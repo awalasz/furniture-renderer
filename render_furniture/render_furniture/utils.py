@@ -28,8 +28,6 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     """ TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
                negative and positive values on axis. I will handle this at the end. For now i just use axis values.
 
-        TODO 2 - for "rev" planes left is also opposite to right! up, down and height properties should not be touched.
-
                  ^ Y
                  |
                  |
@@ -50,17 +48,18 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     x_attr, y_attr = plane.value.lower()[-2:]
     height_attr = list({"x", "y", "z"} - {x_attr, y_attr})[0]
 
-    left_attr = x_attr + "1"
-    right_attr = x_attr + "2"
+    left = geometry[x_attr + "1"]
+    right = geometry[x_attr + "2"]
 
-    if "-" in plane.value.lower():
+    if "-" in plane.value.lower():  # is negated plane
         height = -min(geometry[height_attr + "1"], geometry[height_attr + "2"])
-        left_attr, right_attr = right_attr, left_attr
+        left, right = -left, -right
     else:
         height = max(geometry[height_attr + "1"], geometry[height_attr + "2"])
+
     return Rectangle(
-        left=geometry[left_attr],
-        right=geometry[right_attr],
+        left=left,
+        right=right,
         top=geometry[y_attr + "1"],
         bottom=geometry[y_attr + "2"],
         height=height,
