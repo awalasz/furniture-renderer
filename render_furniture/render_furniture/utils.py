@@ -26,22 +26,24 @@ class Render(ABC):
 
 def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     """ TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
-               negative and positive values on axis. I will handle this at the end. For now i just use axis values.
+               negative and positive values on axis.
+               This is related to the XZ plane - Right is on negative X axis, Left on positive.
+               I will handle this at the end. For now i just use axis values.
 
-                 ^ Y                                ^ Y
+                 ^ Z                                ^ Z
                  |   123                      321   |
                  |   456  789            987  654   |
-                 |_____________> X  -X <____________|
+                 |_____________> Y  -Y <____________|
                 /                                  /
                /                                  /
-              V Z                                V Z
+              V X                                V X
 
     :param geometry: Geometry object to be casted to flat rectangle with height property
     :param plane: plane to which geometry will be casted
     :return: "flat" Rectangle object with height property
     """
     if not isinstance(plane, PlaneChoices):
-        raise TypeError("plane must be PlaneChoices enum instance")
+        raise TypeError("plane must be a PlaneChoices enum instance")
 
     geometry = dict(geometry)
 
@@ -51,17 +53,29 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     left = geometry[x_attr + "1"]
     right = geometry[x_attr + "2"]
 
+    # when casting to 2D the "height" is not visible but it's needed to determine what's the "Z" index of the object.
+    # We take the closer side of the cuboid.
     if "-" in plane.value.lower():  # is negated plane
         height = -min(geometry[height_attr + "1"], geometry[height_attr + "2"])
         left, right = -left, -right
     else:
         height = max(geometry[height_attr + "1"], geometry[height_attr + "2"])
 
+    # Geometry is described in 3D by two points. When casting to 2D they are diagonal in a rectangle
+    # it's not determined if x1 (y1/z1) is smaller or bigger than x2 (y2/z2),
+    # let's sort that for convenience, like height above
+    if left > right:
+        left, right = right, left
+
+    top, bottom = geometry[y_attr + "1"], geometry[y_attr + "2"]
+    if bottom > top:
+        bottom, top = top, bottom
+
     return Rectangle(
         left=left,
         right=right,
-        top=geometry[y_attr + "1"],
-        bottom=geometry[y_attr + "2"],
+        top=top,
+        bottom=bottom,
         height=height,
     )
 
