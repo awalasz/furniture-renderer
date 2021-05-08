@@ -24,7 +24,7 @@ class Render(ABC):
         pass
 
 
-def geometry2rectangle(g: Geometry, plane: PlaneChoices) -> Rectangle:
+def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     """ TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
                negative and positive values on axis. I will handle this at the end. For now i just use axis values.
 
@@ -38,39 +38,33 @@ def geometry2rectangle(g: Geometry, plane: PlaneChoices) -> Rectangle:
                /
               V Z
 
-    :param g: Geometry object to be casted to flat rectangle with height property
+    :param geometry: Geometry object to be casted to flat rectangle with height property
     :param plane: plane to which geometry will be casted
     :return: "flat" Rectangle object with height property
     """
-    if plane in [PlaneChoices.XY, PlaneChoices.XY_rev]:
-        height = -min(g.z1, g.z2) if 'rev' in plane.nanme else max(g.z1, g.z2)
-        return Rectangle(
-            x1=g.x1,
-            x2=g.x2,
-            y1=g.y1,
-            y2=g.y2,
-            height=height,
-        )
-    elif plane in [PlaneChoices.YZ, PlaneChoices.YZ_rev]:
-        height = -min(g.x1, g.x2) if 'rev' in plane.nanme else max(g.x1, g.x2)
-        return Rectangle(
-            x1=g.y1,
-            x2=g.y2,
-            y1=g.z1,
-            y2=g.z2,
-            height=height,
-        )
-    elif plane in [PlaneChoices.XZ, PlaneChoices.XZ_rev]:
-        height = -min(g.y1, g.y2) if 'rev' in plane.nanme else max(g.y1, g.y2)
-        return Rectangle(
-            x1=g.x1,
-            x2=g.x2,
-            y1=g.z1,
-            y2=g.z2,
-            height=height,
-        )
+    if not isinstance(plane, PlaneChoices):
+        raise TypeError("plane must be PlaneChoices enum instance")
+
+    geometry = dict(geometry)
+
+    x_attr, y_attr = plane.value.lower()[-2:]
+    height_attr = list({"x", "y", "z"} - {x_attr, y_attr})[0]
+
+    left_attr = x_attr + "1"
+    right_attr = x_attr + "2"
+
+    if "-" in plane.value.lower():
+        height = -min(geometry[height_attr + "1"], geometry[height_attr + "2"])
+        left_attr, right_attr = right_attr, left_attr
     else:
-        raise ValueError(f"Unknown plane: {plane}")
+        height = max(geometry[height_attr + "1"], geometry[height_attr + "2"])
+    return Rectangle(
+        left=geometry[left_attr],
+        right=geometry[right_attr],
+        top=geometry[y_attr + "1"],
+        bottom=geometry[y_attr + "2"],
+        height=height,
+    )
 
 
 def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:

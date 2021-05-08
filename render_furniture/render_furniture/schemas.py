@@ -28,9 +28,9 @@ class Body(BaseModel, extra=Extra.forbid):
 
 
 class Rectangle(BaseModel):
-    x1: int
-    x2: int
-    y1: int
-    y2: int
+    left: int
+    right: int
+    top: int
+    bottom: int
 
     height: int
