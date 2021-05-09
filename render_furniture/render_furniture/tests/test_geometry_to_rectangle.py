@@ -40,23 +40,26 @@ A = Geometry(x1=2, y1=1, z1=4, x2=-1, y2=3, z2=8)
 B = Geometry(x1=2, y1=12, z1=4, x2=-3, y2=5, z2=6)
 
 
-@pytest.mark.parametrize("plane, expected_a, expected_b", [
-    (
-        PlaneChoices.XY,
-        Rectangle(left=-1, right=2, bottom=1, top=3, height=8),
-        Rectangle(left=-3, right=2, bottom=5, top=12, height=6)
-    ),
-    (
-        PlaneChoices.YZ,
-        Rectangle(left=1, right=3, bottom=4, top=8, height=2),
-        Rectangle(left=5, right=12, bottom=4, top=6, height=2)
-    ),
-    (
-        PlaneChoices.XZ,
-        Rectangle(left=2, right=-1, bottom=4, top=8, height=3),
-        Rectangle(left=2, right=-3, bottom=4, top=6, height=12)
-    ),  # TODO - this test if failing because of my Right and Left side interpretation. To validate later.
-])
+@pytest.mark.parametrize(
+    "plane, expected_a, expected_b",
+    [
+        (
+            PlaneChoices.XY,
+            Rectangle(left=-1, right=2, bottom=1, top=3, height=8),
+            Rectangle(left=-3, right=2, bottom=5, top=12, height=6),
+        ),
+        (
+            PlaneChoices.YZ,
+            Rectangle(left=1, right=3, bottom=4, top=8, height=2),
+            Rectangle(left=5, right=12, bottom=4, top=6, height=2),
+        ),
+        (
+            PlaneChoices.XZ,
+            Rectangle(left=2, right=-1, bottom=4, top=8, height=3),
+            Rectangle(left=2, right=-3, bottom=4, top=6, height=12),
+        ),  # TODO - this test if failing because of my Right and Left side interpretation. To validate later.
+    ],
+)
 def test_casting_to_2d(plane, expected_a, expected_b):
     ra = geometry2rectangle(geometry=A, plane=plane)
     rb = geometry2rectangle(geometry=B, plane=plane)

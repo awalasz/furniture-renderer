@@ -1,5 +1,9 @@
 import pytest
-from render_furniture.render_furniture.utils import sorted_geometries, sorted_rectangles, geometry2rectangle
+from render_furniture.render_furniture.utils import (
+    sorted_geometries,
+    sorted_rectangles,
+    geometry2rectangle,
+)
 from render_furniture.render_furniture.schemas import Geometry, PlaneChoices
 
 
@@ -61,7 +65,9 @@ def test_sort_rectangles():
     b = Geometry(x1=11, x2=12, y1=1, y2=2, z1=1, z2=2)
     c = Geometry(x1=21, x2=22, y1=1, y2=2, z1=1, z2=2)
 
-    rectangles = list(map(lambda g: geometry2rectangle(plane=PlaneChoices.YZ, geometry=g), [b, a, c]))
+    rectangles = list(
+        map(lambda g: geometry2rectangle(plane=PlaneChoices.YZ, geometry=g), [b, a, c])
+    )
 
     sorted_r = sorted_rectangles(rectangles=rectangles)
     assert sorted_r[0].height == 22

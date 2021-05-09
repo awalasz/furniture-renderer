@@ -25,7 +25,7 @@ class Render(ABC):
 
 
 def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
-    """ TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
+    """TODO - depending on the plane, Left and Right to the common users of furniture app would not be the same as
                negative and positive values on axis.
                This is related to the XZ plane - Right is on negative X axis, Left on positive.
                I will handle this at the end. For now i just use axis values.
@@ -118,25 +118,33 @@ def is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     if not top_rect.height > bottom_rect.height:
         return False
 
-    return all((
-        top_rect.left <= bottom_rect.left <= top_rect.right,
-        top_rect.left <= bottom_rect.right <= top_rect.right,
-        top_rect.bottom <= bottom_rect.bottom <= top_rect.top,
-        top_rect.bottom <= bottom_rect.top <= top_rect.top
-    ))
+    return all(
+        (
+            top_rect.left <= bottom_rect.left <= top_rect.right,
+            top_rect.left <= bottom_rect.right <= top_rect.right,
+            top_rect.bottom <= bottom_rect.bottom <= top_rect.top,
+            top_rect.bottom <= bottom_rect.top <= top_rect.top,
+        )
+    )
 
 
-def remove_shadowed_geometries(rectangles: List[Rectangle]) -> List[Rectangle]:
-    sorted_rects = sorted_rectangles(rectangles) #  returns copy of list. It's safe to pop form new list - TODO: TEST IT
+def remove_shadowed(rectangles: List[Rectangle]) -> List[Rectangle]:
+    """Warning: This method only removes rectangles fully shadowed by other rectangle. This method do not remove rectangle
+    fully shadowed by multiple other rectangles, but not fully by one of them
 
-    # sorted_geometry = sorted_geometries(geometry, plane)
-    # # TODO - i was thinking to use functools.reduce, but it's not the case
-    # closest = sorted_geometry[0]
-    # for next_geometry in sorted_geometry[1:]:
-    #     if all(
-    #         next_geometry
-    #     ):
-    return sorted_rects
+    DISCLAIMER:
+    Since this removal is not crucial for resulting SVG output (This removal was introduced only to be used for
+    speed up potentially slowly precessing of multiple figures during render) - I decided to skip that part.
+    """
+    sorted_rects = sorted_rectangles(
+        rectangles
+    )
+    not_shadowed = [sorted_rects[0]]
+    for current_rect in sorted_rects[1:]:
+        if all(not is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_shadowed):
+            not_shadowed.append(current_rect)
+
+    return not_shadowed
 
 
 class RenderSVG(Render):

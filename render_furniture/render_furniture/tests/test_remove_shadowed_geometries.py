@@ -11,7 +11,7 @@ xxx : closer geometry
 import pytest
 
 from render_furniture.render_furniture.schemas import Rectangle
-from render_furniture.render_furniture.utils import remove_shadowed_geometries, is_shadowed
+from render_furniture.render_furniture.utils import remove_shadowed, is_shadowed
 
 
 def test_partially_shadowed():
@@ -71,13 +71,39 @@ def test_smaller_over_big():
 
 def test_side_overlapping():
     """
-        +x-x+xxxxx
-        |   |    x
-        x   |    x
-        |---+    x
-        xxxxxxxxxx
+    +x-x+xxxxx
+    |   |    x
+    x   |    x
+    |---+    x
+    xxxxxxxxxx
 
-        """
+    """
     close = Rectangle(height=10, left=0, right=10, bottom=0, top=10)
     far = Rectangle(height=0, left=0, right=5, bottom=5, top=10)
     assert is_shadowed(top_rect=close, bottom_rect=far) is True
+
+
+def test_removing_fully_shadowed_rectangles():
+    """
+    in this example "A" WOULDN'T BE REMOVED:
+    even if A is shadowed by C and B together, both "B" and "C" are not shadowing "A" individualy and this situation
+    is not handled.
+
+    order by height: C, B, A, D
+
+    DCDCCCCCCCCCC
+    C  D    BBBBCBBBBB
+    DD DA A BA ACA A B
+    C   A   B   C  A B
+    C   A A B  ACA A B
+    C       BBBBCBBBBB
+    CCCCCCCCCCCCC
+    """
+    a = Rectangle(height=1, left=2, right=8, bottom=2, top=3)
+    b = Rectangle(height=2, left=4, right=10, bottom=1, top=4)
+    c = Rectangle(height=3, left=0, right=6, bottom=0, top=5)
+    d = Rectangle(height=0, left=0, right=3, bottom=3, top=5)
+    original_list = [a, b, c, d]
+    res = remove_shadowed(rectangles=original_list)
+    assert res == [c, b, a]
+    assert original_list == [a, b, c, d]  # test if res was a copy.
