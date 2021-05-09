@@ -8,8 +8,6 @@ xxx : closer geometry
 --- : further geometry
 
 """
-import pytest
-
 from render_furniture.render_furniture.schemas import Rectangle
 from render_furniture.render_furniture.utils import remove_shadowed, is_shadowed
 
