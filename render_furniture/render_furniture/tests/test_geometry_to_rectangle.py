@@ -45,18 +45,18 @@ B = Geometry(x1=2, y1=12, z1=4, x2=-3, y2=5, z2=6)
     [
         (
             PlaneChoices.XY,
-            Rectangle(left=-1, right=2, bottom=1, top=3, depth=8),
-            Rectangle(left=-3, right=2, bottom=5, top=12, depth=6),
+            Rectangle(x=-1, width=3, y=1, height=2, depth=8),
+            Rectangle(x=-3, width=5, y=5, height=7, depth=6),
         ),
         (
             PlaneChoices.YZ,
-            Rectangle(left=1, right=3, bottom=4, top=8, depth=2),
-            Rectangle(left=5, right=12, bottom=4, top=6, depth=2),
+            Rectangle(x=1, width=2, y=4, height=4, depth=2),
+            Rectangle(x=5, width=7, y=4, height=2, depth=2),
         ),
         (
             PlaneChoices.XZ,
-            Rectangle(left=2, right=-1, bottom=4, top=8, depth=3),
-            Rectangle(left=2, right=-3, bottom=4, top=6, depth=12),
+            Rectangle(x=2, width=3, y=4, height=4, depth=3),
+            Rectangle(x=2, width=5, y=4, height=2, depth=12),
         ),  # TODO - this test if failing because of my Right and Left side interpretation. To validate later.
     ],
 )
@@ -64,8 +64,8 @@ def test_casting_to_2d(plane, expected_a, expected_b):
     ra = geometry2rectangle(geometry=A, plane=plane)
     rb = geometry2rectangle(geometry=B, plane=plane)
 
-    assert ra == expected_a
-    assert rb == expected_b
+    assert expected_a == ra
+    assert expected_b == rb
 
 
 """

@@ -8,7 +8,7 @@ xxx : closer geometry
 --- : further geometry
 
 """
-from render_furniture.render_furniture.schemas import Rectangle, Body
+from render_furniture.render_furniture.schemas import Rectangle
 from render_furniture.render_furniture.utils import remove_shadowed, is_shadowed
 
 
@@ -23,8 +23,8 @@ def test_partially_shadowed():
     -5     +--------+
        0   5   10   15
     """
-    close = Rectangle(depth=10, left=0, right=10, bottom=0, top=10)
-    far = Rectangle(depth=0, left=5, right=15, bottom=-5, top=5)
+    close = Rectangle(depth=10, x=0, width=10, y=0, height=10)
+    far = Rectangle(depth=0, x=5, width=10, y=-5, height=10)
     assert is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
@@ -35,8 +35,8 @@ def test_not_overlapped():
     x    x    |    |
     xxxxxx    +----+
     """
-    close = Rectangle(depth=10, left=0, right=10, bottom=0, top=10)
-    far = Rectangle(depth=0, left=15, right=25, bottom=0, top=10)
+    close = Rectangle(depth=10, x=0, width=5, y=0, height=10)
+    far = Rectangle(depth=0, x=10, width=5, y=0, height=10)
     assert is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
@@ -48,8 +48,8 @@ def test_fully_shadowed():
     x  +--+ x
     xxxxxxxxx
     """
-    close = Rectangle(depth=10, left=0, right=15, bottom=0, top=15)
-    far = Rectangle(depth=0, left=5, right=10, bottom=5, top=10)
+    close = Rectangle(depth=10, x=0, width=15, y=0, height=15)
+    far = Rectangle(depth=0, x=5, width=5, y=5, height=10)
     assert is_shadowed(top_rect=close, bottom_rect=far) is True
 
 
@@ -62,8 +62,8 @@ def test_smaller_over_big():
     +--------+
 
     """
-    close = Rectangle(depth=10, left=5, right=10, bottom=5, top=10)
-    far = Rectangle(depth=0, left=0, right=15, bottom=0, top=15)
+    close = Rectangle(depth=10, x=5, width=10, y=5, height=10)
+    far = Rectangle(depth=0, x=0, width=15, y=0, height=15)
     assert is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
@@ -76,8 +76,8 @@ def test_side_overlapping():
     xxxxxxxxxx
 
     """
-    close = Rectangle(depth=10, left=0, right=10, bottom=0, top=10)
-    far = Rectangle(depth=0, left=0, right=5, bottom=5, top=10)
+    close = Rectangle(depth=10, x=0, width=10, y=0, height=10)
+    far = Rectangle(depth=0, x=0, width=5, y=5, height=5)
     assert is_shadowed(top_rect=close, bottom_rect=far) is True
 
 
@@ -97,10 +97,10 @@ def test_removing_fully_shadowed_rectangles():
     C       BBBBCBBBBB
     CCCCCCCCCCCCC
     """
-    a = Rectangle(depth=1, left=2, right=8, bottom=2, top=3)
-    b = Rectangle(depth=2, left=4, right=10, bottom=1, top=4)
-    c = Rectangle(depth=3, left=0, right=6, bottom=0, top=5)
-    d = Rectangle(depth=0, left=0, right=3, bottom=3, top=5)
+    a = Rectangle(depth=1, x=2, width=6, y=2, height=1)
+    b = Rectangle(depth=2, x=4, width=6, y=1, height=3)
+    c = Rectangle(depth=3, x=0, width=6, y=0, height=5)
+    d = Rectangle(depth=0, x=0, width=3, y=3, height=2)
     original_list = [a, b, c, d]
     res = remove_shadowed(rectangles=original_list)
     assert res == [c, b, a]

@@ -38,7 +38,7 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
                /                                  /
               V X                                V X
 
-    :param geometry: Geometry object to be casted to flat rectangle with height property
+    :param geometry: Geometry object to be casted to flat rectangle with depth property
     :param plane: plane to which geometry will be casted
     :return: "flat" Rectangle object with height property
     """
@@ -72,10 +72,10 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
         bottom, top = top, bottom
 
     return Rectangle(
-        left=left,
-        right=right,
-        top=top,
-        bottom=bottom,
+        x=left,
+        width=abs(right - left),
+        height=abs(top-bottom),
+        y=bottom,
         depth=depth,
     )
 
@@ -120,10 +120,10 @@ def is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
 
     return all(
         (
-            top_rect.left <= bottom_rect.left <= top_rect.right,
-            top_rect.left <= bottom_rect.right <= top_rect.right,
-            top_rect.bottom <= bottom_rect.bottom <= top_rect.top,
-            top_rect.bottom <= bottom_rect.top <= top_rect.top,
+            top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width),
+            top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width),
+            top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height),
+            top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height),
         )
     )
 
