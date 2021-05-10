@@ -30,13 +30,13 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
                This is related to the XZ plane - Right is on negative X axis, Left on positive.
                I will handle this at the end. For now i just use axis values.
 
-                 ^ Z                                ^ Z
-                 |   123                      321   |
-                 |   456  789            987  654   |
-                 |_____________> Y  -Y <____________|
-                /                                  /
-               /                                  /
-              V X                                V X
+                 ^ Y
+                 |
+                 |
+                 |_____________> X
+                /
+               /
+              V Z
 
     :param geometry: Geometry object to be casted to flat rectangle with depth property
     :param plane: plane to which geometry will be casted
@@ -45,37 +45,41 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     if not isinstance(plane, PlaneChoices):
         raise TypeError("plane must be a PlaneChoices enum instance")
 
+    x_attr, y_attr, depth_attr = {
+        PlaneChoices.XY: ('x', 'y', "z"),
+        PlaneChoices.YZ: ("-z", "y", "x"),
+        PlaneChoices.XZ: ("x", "-z", "y"),
+        PlaneChoices.XY_rev: ('-x', 'y', "-z"),
+        PlaneChoices.YZ_rev: ("z", "y", "-x"),
+        PlaneChoices.XZ_rev: ("x", "-z", "-y"),
+    }.get(plane)
+
     geometry = dict(geometry)
+    # TODO - YES - definitely to rewrite. Later.
+    left, right = geometry[x_attr[-1] + "1"], geometry[x_attr[-1] + "2"]
+    if "-" in x_attr:
+        left, right = -left, -right
+    x = min(left, right)
+    width = abs(right - left)
 
-    x_attr, y_attr = plane.value.lower()[-2:]
-    depth_attr = list({"x", "y", "z"} - {x_attr, y_attr})[0]
-
-    left = geometry[x_attr + "1"]
-    right = geometry[x_attr + "2"]
+    top, bottom = geometry[y_attr[-1] + "1"], geometry[y_attr[-1] + "2"]
+    if "-" in y_attr:
+        top, bottom = -top, -bottom
+    y = min(top, bottom)
+    height = abs(top - bottom)
 
     # when casting to 2D the "height" is not visible but it's needed to determine what's the "Z" index of the object.
     # We take the closer side of the cuboid.
     if "-" in plane.value.lower():  # is negated plane
         depth = -min(geometry[depth_attr + "1"], geometry[depth_attr + "2"])
-        left, right = -left, -right
     else:
         depth = max(geometry[depth_attr + "1"], geometry[depth_attr + "2"])
 
-    # Geometry is described in 3D by two points. When casting to 2D they are diagonal in a rectangle
-    # it's not determined if x1 (y1/z1) is smaller or bigger than x2 (y2/z2),
-    # let's sort that for convenience, like height above
-    if left > right:
-        left, right = right, left
-
-    top, bottom = geometry[y_attr + "1"], geometry[y_attr + "2"]
-    if bottom > top:
-        bottom, top = top, bottom
-
     return Rectangle(
-        x=left,
-        width=abs(right - left),
-        height=abs(top-bottom),
-        y=bottom,
+        x=x,
+        width=width,
+        height=height,
+        y=y,
         depth=depth,
     )
 
