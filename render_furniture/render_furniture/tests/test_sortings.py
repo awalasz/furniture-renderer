@@ -1,6 +1,5 @@
 import pytest
 from render_furniture.render_furniture.renderer import (
-    sorted_geometries,
     _sorted_rectangles,
     _geometry2rectangle,
 )
