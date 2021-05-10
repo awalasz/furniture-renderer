@@ -68,18 +68,25 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     y = min(top, bottom)
     height = abs(top - bottom)
 
+    d1, d2 = geometry[depth_attr[-1] + "1"], geometry[depth_attr[-1] + "2"]
+    if "-" in depth_attr:
+        d1, d2 = -d1, -d2
+    depth = max(d1, d2)
+
+
+
     # when casting to 2D the "height" is not visible but it's needed to determine what's the "Z" index of the object.
     # We take the closer side of the cuboid.
-    if "-" in plane.value.lower():  # is negated plane
-        depth = -min(geometry[depth_attr + "1"], geometry[depth_attr + "2"])
-    else:
-        depth = max(geometry[depth_attr + "1"], geometry[depth_attr + "2"])
+    # if "-" in plane.value.lower():  # is negated plane
+    #     depth = -min(geometry[depth_attr[-1] + "1"], geometry[depth_attr[-1] + "2"])
+    # else:
+    #     depth = max(geometry[depth_attr[-1] + "1"], geometry[depth_attr[-1] + "2"])
 
     return Rectangle(
         x=x,
+        y=y,
         width=width,
         height=height,
-        y=y,
         depth=depth,
     )
 

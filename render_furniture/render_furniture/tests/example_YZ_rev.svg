@@ -3,9 +3,9 @@
      width="804" height="1000" viewBox="0 -500 402 500">
 <defs>
 </defs>
-<rect x="41" y="-59" width="320" height="18" fill="#969696" stroke="black" stroke-width="1" />
-<rect x="41" y="-259" width="320" height="18" fill="#969696" stroke="black" stroke-width="1" />
-<rect x="41" y="-459" width="320" height="18" fill="#969696" stroke="black" stroke-width="1" />
-<rect x="41" y="-441" width="320" height="182" fill="#969696" stroke="black" stroke-width="1" />
-<rect x="41" y="-241" width="320" height="182" fill="#969696" stroke="black" stroke-width="1" />
+<rect x="41" y="-59" width="320" height="18" fill="#c8c8c8" stroke="black" stroke-width="1" />
+<rect x="41" y="-259" width="320" height="18" fill="#c8c8c8" stroke="black" stroke-width="1" />
+<rect x="41" y="-459" width="320" height="18" fill="#c8c8c8" stroke="black" stroke-width="1" />
+<rect x="41" y="-441" width="320" height="182" fill="#c8c8c8" stroke="black" stroke-width="1" />
+<rect x="41" y="-241" width="320" height="182" fill="#c8c8c8" stroke="black" stroke-width="1" />
 </svg>

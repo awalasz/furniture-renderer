@@ -33,7 +33,7 @@ def test_body_schema(original_example_input, plane):
 
     def _normalize_shade(depth, min_shade=150, max_shade=200):
         if max_depth == min_depth:
-            return min_shade
+            return max_shade
         return int((depth - min_depth) / (max_depth - min_depth) * (max_shade-min_shade)) + min_shade
 
     print("L", left_min)
