@@ -13,6 +13,7 @@ temp file. I will probably reorganize this code later.
 # TODO: For now plane is literal Literal['XY', 'YZ', 'XZ']. I am considering introducing opposite planes, like '-XY'
 
 from abc import ABC, abstractmethod
+from collections import namedtuple
 from functools import lru_cache
 from typing import List, Tuple
 
@@ -31,43 +32,45 @@ class Render(ABC):
         pass
 
 
+PlaneDescription = namedtuple("PlaneDescription", "x_axis, y_axis, depth_axis")
+
+
 @lru_cache
 def _axes_by_plane(
     plane: PlaneChoices,
-) -> Tuple[AxisDescription, AxisDescription, AxisDescription]:
-    x, y, depth = {
-        PlaneChoices.XY: (
-            AxisDescription(name="x"),
-            AxisDescription(name="y"),
-            AxisDescription(name="z"),
+) -> PlaneDescription:
+    return {
+        PlaneChoices.XY: PlaneDescription(
+            x_axis=AxisDescription(name="x"),
+            y_axis=AxisDescription(name="y"),
+            depth_axis=AxisDescription(name="z"),
         ),
-        PlaneChoices.YZ: (
-            AxisDescription(name="z", negated=True),
-            AxisDescription(name="y"),
-            AxisDescription(name="x"),
+        PlaneChoices.YZ: PlaneDescription(
+            x_axis=AxisDescription(name="z", negated=True),
+            y_axis=AxisDescription(name="y"),
+            depth_axis=AxisDescription(name="x"),
         ),
-        PlaneChoices.XZ: (
-            AxisDescription(name="x"),
-            AxisDescription(name="z", negated=True),
-            AxisDescription(name="y"),
+        PlaneChoices.XZ: PlaneDescription(
+            x_axis=AxisDescription(name="x"),
+            y_axis=AxisDescription(name="z", negated=True),
+            depth_axis=AxisDescription(name="y"),
         ),
-        PlaneChoices.XY_rev: (
-            AxisDescription(name="x", negated=True),
-            AxisDescription(name="y"),
-            AxisDescription(name="z", negated=True),
+        PlaneChoices.XY_rev: PlaneDescription(
+            x_axis=AxisDescription(name="x", negated=True),
+            y_axis=AxisDescription(name="y"),
+            depth_axis=AxisDescription(name="z", negated=True),
         ),
-        PlaneChoices.YZ_rev: (
-            AxisDescription(name="z"),
-            AxisDescription(name="y"),
-            AxisDescription(name="x", negated=True),
+        PlaneChoices.YZ_rev: PlaneDescription(
+            x_axis=AxisDescription(name="z"),
+            y_axis=AxisDescription(name="y"),
+            depth_axis=AxisDescription(name="x", negated=True),
         ),
-        PlaneChoices.XZ_rev: (
-            AxisDescription(name="x"),
-            AxisDescription(name="z", negated=True),
-            AxisDescription(name="y", negated=True),
+        PlaneChoices.XZ_rev: PlaneDescription(
+            x_axis=AxisDescription(name="x"),
+            y_axis=AxisDescription(name="z", negated=True),
+            depth_axis=AxisDescription(name="y", negated=True),
         ),
     }.get(plane)
-    return x, y, depth
 
 
 def _get_coordinate_and_length(
@@ -102,13 +105,19 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     if not isinstance(plane, PlaneChoices):
         raise TypeError("plane must be a PlaneChoices enum instance")
 
-    x_axis, y_axis, depth_axis = _axes_by_plane(plane)
+    plane_description = _axes_by_plane(plane)
 
-    x, width = _get_coordinate_and_length(geometry=geometry, axis=x_axis)
-    y, height = _get_coordinate_and_length(geometry=geometry, axis=y_axis)
+    x, width = _get_coordinate_and_length(
+        geometry=geometry, axis=plane_description.x_axis
+    )
+    y, height = _get_coordinate_and_length(
+        geometry=geometry, axis=plane_description.y_axis
+    )
 
-    depth_1, depth_2 = getattr(geometry, depth_axis.name + "1"), getattr(geometry, depth_axis.name + "2")
-    if depth_axis.negated:
+    depth_1, depth_2 = getattr(
+        geometry, plane_description.depth_axis.name + "1"
+    ), getattr(geometry, plane_description.depth_axis.name + "2")
+    if plane_description.depth_axis.negated:
         depth_1, depth_2 = -depth_1, -depth_2
     depth = max(depth_1, depth_2)
 
