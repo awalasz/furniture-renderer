@@ -48,7 +48,7 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     geometry = dict(geometry)
 
     x_attr, y_attr = plane.value.lower()[-2:]
-    height_attr = list({"x", "y", "z"} - {x_attr, y_attr})[0]
+    depth_attr = list({"x", "y", "z"} - {x_attr, y_attr})[0]
 
     left = geometry[x_attr + "1"]
     right = geometry[x_attr + "2"]
@@ -56,10 +56,10 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     # when casting to 2D the "height" is not visible but it's needed to determine what's the "Z" index of the object.
     # We take the closer side of the cuboid.
     if "-" in plane.value.lower():  # is negated plane
-        height = -min(geometry[height_attr + "1"], geometry[height_attr + "2"])
+        depth = -min(geometry[depth_attr + "1"], geometry[depth_attr + "2"])
         left, right = -left, -right
     else:
-        height = max(geometry[height_attr + "1"], geometry[height_attr + "2"])
+        depth = max(geometry[depth_attr + "1"], geometry[depth_attr + "2"])
 
     # Geometry is described in 3D by two points. When casting to 2D they are diagonal in a rectangle
     # it's not determined if x1 (y1/z1) is smaller or bigger than x2 (y2/z2),
@@ -76,13 +76,13 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
         right=right,
         top=top,
         bottom=bottom,
-        height=height,
+        depth=depth,
     )
 
 
 def sorted_rectangles(rectangles: List[Rectangle]) -> List[Rectangle]:
     """Method returns sorted list of rectangles in order from closest to the further one, based on it's height"""
-    return sorted(rectangles, key=lambda r: r.height, reverse=True)
+    return sorted(rectangles, key=lambda r: r.depth, reverse=True)
 
 
 def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geometry]:
@@ -115,7 +115,7 @@ def sorted_geometries(geometry: List[Geometry], plane: PlaneChoices) -> List[Geo
 def is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     """returns True if top_rect fully shadows bottom_rect"""
     # sanity check:
-    if not top_rect.height > bottom_rect.height:
+    if not top_rect.depth > bottom_rect.depth:
         return False
 
     return all(

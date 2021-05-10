@@ -26,8 +26,8 @@ def test_body_schema(original_example_input, plane):
     bottom_min = min(rectangles, key=lambda rect: rect.bottom).bottom
     top_max = max(rectangles, key=lambda rect: rect.top).top
 
-    max_height = max(rectangles, key=lambda rect: rect.height).height
-    min_height = min(rectangles, key=lambda rect: rect.height).height
+    max_depth = max(rectangles, key=lambda rect: rect.depth).depth
+    min_depth = min(rectangles, key=lambda rect: rect.depth).depth
 
 
     print("L", left_min)
@@ -38,7 +38,6 @@ def test_body_schema(original_example_input, plane):
     print("W", width)
     height = top_max - bottom_min
     print("H", height)
-
 
     padding = int(0.1 * max(width, height))
     d = draw.Drawing(width + padding*2, height + padding*2)

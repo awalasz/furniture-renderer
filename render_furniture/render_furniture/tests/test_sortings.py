@@ -70,6 +70,6 @@ def test_sort_rectangles():
     )
 
     sorted_r = sorted_rectangles(rectangles=rectangles)
-    assert sorted_r[0].height == 22
-    assert sorted_r[1].height == 12
-    assert sorted_r[2].height == 2
+    assert sorted_r[0].depth == 22
+    assert sorted_r[1].depth == 12
+    assert sorted_r[2].depth == 2

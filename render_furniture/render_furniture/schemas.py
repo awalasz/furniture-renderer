@@ -33,4 +33,4 @@ class Rectangle(BaseModel):
     top: int
     bottom: int
 
-    height: int
+    depth: int

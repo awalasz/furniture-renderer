@@ -45,18 +45,18 @@ B = Geometry(x1=2, y1=12, z1=4, x2=-3, y2=5, z2=6)
     [
         (
             PlaneChoices.XY,
-            Rectangle(left=-1, right=2, bottom=1, top=3, height=8),
-            Rectangle(left=-3, right=2, bottom=5, top=12, height=6),
+            Rectangle(left=-1, right=2, bottom=1, top=3, depth=8),
+            Rectangle(left=-3, right=2, bottom=5, top=12, depth=6),
         ),
         (
             PlaneChoices.YZ,
-            Rectangle(left=1, right=3, bottom=4, top=8, height=2),
-            Rectangle(left=5, right=12, bottom=4, top=6, height=2),
+            Rectangle(left=1, right=3, bottom=4, top=8, depth=2),
+            Rectangle(left=5, right=12, bottom=4, top=6, depth=2),
         ),
         (
             PlaneChoices.XZ,
-            Rectangle(left=2, right=-1, bottom=4, top=8, height=3),
-            Rectangle(left=2, right=-3, bottom=4, top=6, height=12),
+            Rectangle(left=2, right=-1, bottom=4, top=8, depth=3),
+            Rectangle(left=2, right=-3, bottom=4, top=6, depth=12),
         ),  # TODO - this test if failing because of my Right and Left side interpretation. To validate later.
     ],
 )
