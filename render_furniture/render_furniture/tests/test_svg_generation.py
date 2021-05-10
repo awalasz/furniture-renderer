@@ -6,10 +6,10 @@ import drawSvg as draw
 import pytest
 
 from render_furniture.render_furniture.schemas import Body, PlaneChoices
-from render_furniture.render_furniture.utils import (
-    geometry2rectangle,
-    sorted_rectangles,
-    remove_shadowed,
+from render_furniture.render_furniture.renderer import (
+    _geometry2rectangle,
+    _sorted_rectangles,
+    _remove_overlapped,
 )
 
 
@@ -19,10 +19,10 @@ def test_body_schema(original_example_input, plane):
     body = Body.parse_obj(original_example_input)
 
     rectangles = list(
-        map(lambda g: geometry2rectangle(plane=plane, geometry=g), body.geometry)
+        map(lambda g: _geometry2rectangle(plane=plane, geometry=g), body.geometry)
     )
-    rectangles = sorted_rectangles(rectangles)
-    rectangles = remove_shadowed(rectangles)
+    rectangles = _sorted_rectangles(rectangles)
+    rectangles = _remove_overlapped(rectangles)
     rectangles.reverse()  # draw from furhtest to the closest one
 
     left_min = min(rectangles, key=lambda rect: rect.x).x

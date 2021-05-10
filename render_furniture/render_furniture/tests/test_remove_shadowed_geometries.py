@@ -8,8 +8,7 @@ xxx : closer geometry
 --- : further geometry
 
 """
-from render_furniture.render_furniture.schemas import Rectangle
-from render_furniture.render_furniture.utils import remove_shadowed, is_shadowed
+from render_furniture.render_furniture.renderer import Rectangle, _remove_overlapped, _is_shadowed
 
 
 def test_partially_shadowed():
@@ -25,7 +24,7 @@ def test_partially_shadowed():
     """
     close = Rectangle(depth=10, x=0, width=10, y=0, height=10)
     far = Rectangle(depth=0, x=5, width=10, y=-5, height=10)
-    assert is_shadowed(top_rect=close, bottom_rect=far) is False
+    assert _is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
 def test_not_overlapped():
@@ -37,7 +36,7 @@ def test_not_overlapped():
     """
     close = Rectangle(depth=10, x=0, width=5, y=0, height=10)
     far = Rectangle(depth=0, x=10, width=5, y=0, height=10)
-    assert is_shadowed(top_rect=close, bottom_rect=far) is False
+    assert _is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
 def test_fully_shadowed():
@@ -50,7 +49,7 @@ def test_fully_shadowed():
     """
     close = Rectangle(depth=10, x=0, width=15, y=0, height=15)
     far = Rectangle(depth=0, x=5, width=5, y=5, height=10)
-    assert is_shadowed(top_rect=close, bottom_rect=far) is True
+    assert _is_shadowed(top_rect=close, bottom_rect=far) is True
 
 
 def test_smaller_over_big():
@@ -64,7 +63,7 @@ def test_smaller_over_big():
     """
     close = Rectangle(depth=10, x=5, width=10, y=5, height=10)
     far = Rectangle(depth=0, x=0, width=15, y=0, height=15)
-    assert is_shadowed(top_rect=close, bottom_rect=far) is False
+    assert _is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
 def test_side_overlapping():
@@ -78,7 +77,7 @@ def test_side_overlapping():
     """
     close = Rectangle(depth=10, x=0, width=10, y=0, height=10)
     far = Rectangle(depth=0, x=0, width=5, y=5, height=5)
-    assert is_shadowed(top_rect=close, bottom_rect=far) is True
+    assert _is_shadowed(top_rect=close, bottom_rect=far) is True
 
 
 def test_removing_fully_shadowed_rectangles():
@@ -102,6 +101,6 @@ def test_removing_fully_shadowed_rectangles():
     c = Rectangle(depth=3, x=0, width=6, y=0, height=5)
     d = Rectangle(depth=0, x=0, width=3, y=3, height=2)
     original_list = [a, b, c, d]
-    res = remove_shadowed(rectangles=original_list)
+    res = _remove_overlapped(rectangles=original_list)
     assert res == [c, b, a]
     assert original_list == [a, b, c, d]  # test if res was a copy.

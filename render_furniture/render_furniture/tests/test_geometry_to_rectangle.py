@@ -70,8 +70,8 @@ XZ plane:
 """
 import pytest
 
-from render_furniture.render_furniture.schemas import Geometry, Rectangle, PlaneChoices
-from render_furniture.render_furniture.utils import geometry2rectangle
+from render_furniture.render_furniture.schemas import Geometry, PlaneChoices
+from render_furniture.render_furniture.renderer import Rectangle, _geometry2rectangle
 
 A = Geometry(x1=1, y1=4, z1=2, x2=3, y2=8, z2=-1)
 B = Geometry(x1=12, y1=4, z1=2, x2=5, y2=6, z2=-3)
@@ -98,8 +98,8 @@ B = Geometry(x1=12, y1=4, z1=2, x2=5, y2=6, z2=-3)
     ],
 )
 def test_casting_to_2d(plane, expected_a, expected_b):
-    ra = geometry2rectangle(geometry=A, plane=plane)
-    rb = geometry2rectangle(geometry=B, plane=plane)
+    ra = _geometry2rectangle(geometry=A, plane=plane)
+    rb = _geometry2rectangle(geometry=B, plane=plane)
 
     assert ra == expected_a
     assert rb == expected_b
