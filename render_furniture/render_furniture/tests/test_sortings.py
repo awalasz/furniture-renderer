@@ -1,9 +1,9 @@
 import pytest
-from render_furniture.render_furniture.renderer import (
+from render_furniture.renderer import (
     _sorted_rectangles,
     _geometry2rectangle,
 )
-from render_furniture.render_furniture.schemas import Geometry, PlaneChoices
+from render_furniture.schemas import Geometry, PlaneChoices
 
 
 x_close = Geometry(x1=5, x2=6, y1=-1, y2=1, z1=-1, z2=1)

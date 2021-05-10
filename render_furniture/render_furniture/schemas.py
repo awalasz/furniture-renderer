@@ -1,6 +1,8 @@
-from pydantic import BaseModel, Extra
-from typing import List, Literal
 from enum import Enum
+from typing import List
+
+from ninja import Schema
+from pydantic import BaseModel, Extra
 
 
 class PlaneChoices(Enum):
@@ -22,6 +24,10 @@ class Geometry(BaseModel, extra=Extra.forbid):
     z2: int
 
 
-class Body(BaseModel, extra=Extra.forbid):
+class Body(Schema):
     geometry: List[Geometry]
     projection_plane: PlaneChoices
+
+    class Config:
+        extra = Extra.forbid
+        use_enum_values = True

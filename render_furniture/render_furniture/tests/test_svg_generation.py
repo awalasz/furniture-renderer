@@ -5,8 +5,8 @@
 import drawSvg as draw
 import pytest
 
-from render_furniture.render_furniture.schemas import Body, PlaneChoices
-from render_furniture.render_furniture.renderer import (
+from render_furniture.schemas import Body, PlaneChoices
+from render_furniture.renderer import (
     _geometry2rectangle,
     _sorted_rectangles,
     _remove_overlapped,

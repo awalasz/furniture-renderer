@@ -1,5 +1,5 @@
 import pytest
-from render_furniture.render_furniture.schemas import Body, Geometry, PlaneChoices
+from render_furniture.schemas import Body, Geometry, PlaneChoices
 
 
 def test_body_schema(original_example_input):
@@ -14,7 +14,7 @@ def test_invalid_body_schema_from_example(original_example_input):
 
 def test_body(original_example_input):
     parsed = Body.parse_obj(original_example_input)
-    assert parsed.projection_plane == PlaneChoices.XY
+    assert parsed.projection_plane == PlaneChoices.XY.value
     assert len(parsed.geometry) == 13
     assert all(isinstance(g, Geometry) for g in parsed.geometry)
 

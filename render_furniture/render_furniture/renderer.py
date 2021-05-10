@@ -10,7 +10,7 @@ from typing import List, Tuple, Literal
 
 from pydantic import BaseModel
 
-from render_furniture.render_furniture.schemas import (
+from render_furniture.schemas import (
     Body,
     Geometry,
     PlaneChoices,

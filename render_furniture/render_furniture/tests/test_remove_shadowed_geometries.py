@@ -8,7 +8,7 @@ xxx : closer geometry
 --- : further geometry
 
 """
-from render_furniture.render_furniture.renderer import (
+from render_furniture.renderer import (
     Rectangle,
     _remove_overlapped,
     _is_shadowed,
