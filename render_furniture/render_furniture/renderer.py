@@ -1,4 +1,3 @@
-
 # TODO:
 #  1. validation? Check if some Geometries has conflicts in space? Ignore for now.
 #  3. rendering farest to cloesest.
@@ -173,7 +172,7 @@ def _remove_overlapped(rectangles: List[Rectangle]) -> List[Rectangle]:
     not_shadowed = [sorted_rects[0]]
     for current_rect in sorted_rects[1:]:
         if all(
-                not _is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_shadowed
+            not _is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_shadowed
         ):
             not_shadowed.append(current_rect)
 

@@ -22,9 +22,7 @@ def geometries():
 
 
 def _rectangles(geometry, plane):
-    return list(
-        map(lambda g: _geometry2rectangle(plane=plane, geometry=g), geometry)
-    )
+    return list(map(lambda g: _geometry2rectangle(plane=plane, geometry=g), geometry))
 
 
 @pytest.mark.parametrize(
@@ -61,5 +59,3 @@ def test_sort_rectangles():
     assert rev_sorted_rect[0].depth == -1
     assert rev_sorted_rect[1].depth == -11
     assert rev_sorted_rect[2].depth == -21
-
-

@@ -8,7 +8,11 @@ xxx : closer geometry
 --- : further geometry
 
 """
-from render_furniture.render_furniture.renderer import Rectangle, _remove_overlapped, _is_shadowed
+from render_furniture.render_furniture.renderer import (
+    Rectangle,
+    _remove_overlapped,
+    _is_shadowed,
+)
 
 
 def test_partially_shadowed():
