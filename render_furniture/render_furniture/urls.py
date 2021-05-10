@@ -14,8 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
+from render_furniture.views import RenderSVGView
 
 urlpatterns = [
-    # path("", api.urls),
+    path("projection", csrf_exempt(RenderSVGView.as_view()), name='RenderSVG'),
 ]
