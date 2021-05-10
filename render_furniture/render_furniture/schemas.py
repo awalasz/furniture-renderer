@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Extra
-from typing import List
+from typing import List, Literal
 from enum import Enum
 
 
@@ -34,3 +34,8 @@ class Rectangle(BaseModel):
     height: int
 
     depth: int
+
+
+class AxisDescription(BaseModel):
+    name: Literal["x", "y", "z"]
+    negated: bool = False

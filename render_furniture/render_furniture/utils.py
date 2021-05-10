@@ -13,13 +13,15 @@ temp file. I will probably reorganize this code later.
 # TODO: For now plane is literal Literal['XY', 'YZ', 'XZ']. I am considering introducing opposite planes, like '-XY'
 
 from abc import ABC, abstractmethod
-from typing import List
+from functools import lru_cache
+from typing import List, Tuple
 
 from render_furniture.render_furniture.schemas import (
     Body,
     Geometry,
     PlaneChoices,
     Rectangle,
+    AxisDescription,
 )
 
 
@@ -27,6 +29,56 @@ class Render(ABC):
     @abstractmethod
     def render(self, *args, **kwargs):
         pass
+
+
+@lru_cache
+def _axes_by_plane(
+    plane: PlaneChoices,
+) -> Tuple[AxisDescription, AxisDescription, AxisDescription]:
+    x, y, depth = {
+        PlaneChoices.XY: (
+            AxisDescription(name="x"),
+            AxisDescription(name="y"),
+            AxisDescription(name="z"),
+        ),
+        PlaneChoices.YZ: (
+            AxisDescription(name="z", negated=True),
+            AxisDescription(name="y"),
+            AxisDescription(name="x"),
+        ),
+        PlaneChoices.XZ: (
+            AxisDescription(name="x"),
+            AxisDescription(name="z", negated=True),
+            AxisDescription(name="y"),
+        ),
+        PlaneChoices.XY_rev: (
+            AxisDescription(name="x", negated=True),
+            AxisDescription(name="y"),
+            AxisDescription(name="z", negated=True),
+        ),
+        PlaneChoices.YZ_rev: (
+            AxisDescription(name="z"),
+            AxisDescription(name="y"),
+            AxisDescription(name="x", negated=True),
+        ),
+        PlaneChoices.XZ_rev: (
+            AxisDescription(name="x"),
+            AxisDescription(name="z", negated=True),
+            AxisDescription(name="y", negated=True),
+        ),
+    }.get(plane)
+    return x, y, depth
+
+
+def _get_coordinate_and_length(
+    geometry: Geometry, axis: AxisDescription
+) -> Tuple[int, int]:
+    a, b = getattr(geometry, f"{axis.name}1"), getattr(geometry, f"{axis.name}2")
+    if axis.negated:
+        a, b = -a, -b
+    coordinate = min(a, b)
+    length = abs(b - a)
+    return coordinate, length
 
 
 def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
@@ -50,40 +102,15 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     if not isinstance(plane, PlaneChoices):
         raise TypeError("plane must be a PlaneChoices enum instance")
 
-    x_attr, y_attr, depth_attr = {
-        PlaneChoices.XY: ("x", "y", "z"),
-        PlaneChoices.YZ: ("-z", "y", "x"),
-        PlaneChoices.XZ: ("x", "-z", "y"),
-        PlaneChoices.XY_rev: ("-x", "y", "-z"),
-        PlaneChoices.YZ_rev: ("z", "y", "-x"),
-        PlaneChoices.XZ_rev: ("x", "-z", "-y"),
-    }.get(plane)
+    x_axis, y_axis, depth_axis = _axes_by_plane(plane)
 
-    geometry = dict(geometry)
-    # TODO - YES - definitely to rewrite. Later.
-    left, right = geometry[x_attr[-1] + "1"], geometry[x_attr[-1] + "2"]
-    if "-" in x_attr:
-        left, right = -left, -right
-    x = min(left, right)
-    width = abs(right - left)
+    x, width = _get_coordinate_and_length(geometry=geometry, axis=x_axis)
+    y, height = _get_coordinate_and_length(geometry=geometry, axis=y_axis)
 
-    top, bottom = geometry[y_attr[-1] + "1"], geometry[y_attr[-1] + "2"]
-    if "-" in y_attr:
-        top, bottom = -top, -bottom
-    y = min(top, bottom)
-    height = abs(top - bottom)
-
-    d1, d2 = geometry[depth_attr[-1] + "1"], geometry[depth_attr[-1] + "2"]
-    if "-" in depth_attr:
-        d1, d2 = -d1, -d2
-    depth = max(d1, d2)
-
-    # when casting to 2D the "height" is not visible but it's needed to determine what's the "Z" index of the object.
-    # We take the closer side of the cuboid.
-    # if "-" in plane.value.lower():  # is negated plane
-    #     depth = -min(geometry[depth_attr[-1] + "1"], geometry[depth_attr[-1] + "2"])
-    # else:
-    #     depth = max(geometry[depth_attr[-1] + "1"], geometry[depth_attr[-1] + "2"])
+    depth_1, depth_2 = getattr(geometry, depth_axis.name + "1"), getattr(geometry, depth_axis.name + "2")
+    if depth_axis.negated:
+        depth_1, depth_2 = -depth_1, -depth_2
+    depth = max(depth_1, depth_2)
 
     return Rectangle(
         x=x,
