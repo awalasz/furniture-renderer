@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import List
 
-from ninja import Schema
 from pydantic import BaseModel, Extra
 
 
@@ -24,7 +23,7 @@ class Geometry(BaseModel, extra=Extra.forbid):
     z2: int
 
 
-class Body(Schema):
+class Body(BaseModel):
     geometry: List[Geometry]
     projection_plane: PlaneChoices
 
