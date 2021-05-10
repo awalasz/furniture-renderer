@@ -179,5 +179,5 @@ def _remove_overlapped(rectangles: List[Rectangle]) -> List[Rectangle]:
     return not_shadowed
 
 
-def render_svg():
+def render_svg(body: Body):
     pass
