@@ -6,7 +6,11 @@ import drawSvg as draw
 import pytest
 
 from render_furniture.render_furniture.schemas import Body, PlaneChoices
-from render_furniture.render_furniture.utils import geometry2rectangle, sorted_rectangles, remove_shadowed
+from render_furniture.render_furniture.utils import (
+    geometry2rectangle,
+    sorted_rectangles,
+    remove_shadowed,
+)
 
 
 @pytest.mark.parametrize("plane", list(PlaneChoices))
@@ -14,10 +18,12 @@ def test_body_schema(original_example_input, plane):
 
     body = Body.parse_obj(original_example_input)
 
-    rectangles = list(map(lambda g: geometry2rectangle(plane=plane, geometry=g), body.geometry))
+    rectangles = list(
+        map(lambda g: geometry2rectangle(plane=plane, geometry=g), body.geometry)
+    )
     rectangles = sorted_rectangles(rectangles)
     rectangles = remove_shadowed(rectangles)
-    rectangles.reverse() # draw from furhtest to the closest one
+    rectangles.reverse()  # draw from furhtest to the closest one
 
     left_min = min(rectangles, key=lambda rect: rect.x).x
     right_max = max(rectangles, key=lambda rect: rect.x + rect.width)
@@ -30,11 +36,13 @@ def test_body_schema(original_example_input, plane):
     max_depth = max(rectangles, key=lambda rect: rect.depth).depth
     min_depth = min(rectangles, key=lambda rect: rect.depth).depth
 
-
     def _normalize_shade(depth, min_shade=150, max_shade=200):
         if max_depth == min_depth:
             return max_shade
-        return int((depth - min_depth) / (max_depth - min_depth) * (max_shade-min_shade)) + min_shade
+        return (
+            int((depth - min_depth) / (max_depth - min_depth) * (max_shade - min_shade))
+            + min_shade
+        )
 
     print("L", left_min)
     print("R", right_max)
@@ -48,14 +56,22 @@ def test_body_schema(original_example_input, plane):
     padding = int(0.1 * max(width, height))
     stroke_width = max(1, (0.001 * min(width, height)))
 
-    d = draw.Drawing(width + padding*2, height + padding*2)
+    d = draw.Drawing(width + padding * 2, height + padding * 2)
     for rectangle in rectangles:
         rectangle.x -= left_min - padding
         rectangle.y -= bottom_min - padding
         print(rectangle)
         shade = _normalize_shade(rectangle.depth)
-        r = draw.Rectangle(rectangle.x, rectangle.y, rectangle.width, rectangle.height, fill='#%02x%02x%02x' % (shade, shade, shade), stroke='black', stroke_width=stroke_width)
+        r = draw.Rectangle(
+            rectangle.x,
+            rectangle.y,
+            rectangle.width,
+            rectangle.height,
+            fill="#{0:02x}{0:02x}{0:02x}".format(shade),
+            stroke="black",
+            stroke_width=stroke_width,
+        )
         d.append(r)
 
     d.setPixelScale(2)
-    d.saveSvg(f'example_{plane.name}.svg')
+    d.saveSvg(f"example_{plane.name}.svg")

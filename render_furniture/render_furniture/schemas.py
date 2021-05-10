@@ -4,13 +4,13 @@ from enum import Enum
 
 
 class PlaneChoices(Enum):
-    XY = 'XY'
-    YZ = 'YZ'
-    XZ = 'XZ'
+    XY = "XY"
+    YZ = "YZ"
+    XZ = "XZ"
 
-    XY_rev = '-XY'
-    YZ_rev = '-YZ'
-    XZ_rev = '-XZ'
+    XY_rev = "-XY"
+    YZ_rev = "-YZ"
+    XZ_rev = "-XZ"
 
 
 class Geometry(BaseModel, extra=Extra.forbid):

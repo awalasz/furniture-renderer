@@ -15,7 +15,12 @@ temp file. I will probably reorganize this code later.
 from abc import ABC, abstractmethod
 from typing import List
 
-from render_furniture.render_furniture.schemas import Body, Geometry, PlaneChoices, Rectangle
+from render_furniture.render_furniture.schemas import (
+    Body,
+    Geometry,
+    PlaneChoices,
+    Rectangle,
+)
 
 
 class Render(ABC):
@@ -46,10 +51,10 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
         raise TypeError("plane must be a PlaneChoices enum instance")
 
     x_attr, y_attr, depth_attr = {
-        PlaneChoices.XY: ('x', 'y', "z"),
+        PlaneChoices.XY: ("x", "y", "z"),
         PlaneChoices.YZ: ("-z", "y", "x"),
         PlaneChoices.XZ: ("x", "-z", "y"),
-        PlaneChoices.XY_rev: ('-x', 'y', "-z"),
+        PlaneChoices.XY_rev: ("-x", "y", "-z"),
         PlaneChoices.YZ_rev: ("z", "y", "-x"),
         PlaneChoices.XZ_rev: ("x", "-z", "-y"),
     }.get(plane)
@@ -72,8 +77,6 @@ def geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     if "-" in depth_attr:
         d1, d2 = -d1, -d2
     depth = max(d1, d2)
-
-
 
     # when casting to 2D the "height" is not visible but it's needed to determine what's the "Z" index of the object.
     # We take the closer side of the cuboid.
@@ -132,9 +135,13 @@ def is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     return all(
         (
             top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width),
-            top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width),
+            top_rect.x
+            <= (bottom_rect.x + bottom_rect.width)
+            <= (top_rect.x + top_rect.width),
             top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height),
-            top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height),
+            top_rect.y
+            <= (bottom_rect.y + bottom_rect.height)
+            <= (top_rect.y + top_rect.height),
         )
     )
 
@@ -147,12 +154,12 @@ def remove_shadowed(rectangles: List[Rectangle]) -> List[Rectangle]:
     Since this removal is not crucial for resulting SVG output (This removal was introduced only to be used for
     speed up potentially slowly precessing of multiple figures during render) - I decided to skip that part.
     """
-    sorted_rects = sorted_rectangles(
-        rectangles
-    )
+    sorted_rects = sorted_rectangles(rectangles)
     not_shadowed = [sorted_rects[0]]
     for current_rect in sorted_rects[1:]:
-        if all(not is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_shadowed):
+        if all(
+            not is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_shadowed
+        ):
             not_shadowed.append(current_rect)
 
     return not_shadowed
