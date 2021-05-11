@@ -3,4 +3,17 @@ Recruitment task
 
 # Requirements
 
-- Python 3.6+ (Developed and tested with python 3.8.5)
+- Docker
+
+# Installation
+
+## Build the image:
+> $ docker build --tag svg_renderer:latest .
+
+## Run the container:
+> $ docker run -p 8000:8000 svg_renderer:latest
+
+# Additional features
+- remove obscured geometries
+- further geometries are darker
+- negated planes (like -XY) allowing to see the furniture from the other side.

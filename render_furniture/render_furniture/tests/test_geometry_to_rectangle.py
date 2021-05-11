@@ -11,7 +11,7 @@ ROTATION
  /
 /Z
 
-Then, negation of "Z" ( -to fit left and right)
+Then, negation of "Z" ( -to fit left and right from users perspective)
 
  Y^ /Z
   |/
@@ -97,23 +97,9 @@ B = Geometry(x1=12, y1=4, z1=2, x2=5, y2=6, z2=-3)
         ),
     ],
 )
-def test_casting_to_2d(plane, expected_a, expected_b):
+def test_casting_geometry_to_2d_gives_expected_rectangle(plane, expected_a, expected_b):
     ra = _geometry2rectangle(geometry=A, plane=plane)
     rb = _geometry2rectangle(geometry=B, plane=plane)
 
     assert ra == expected_a
     assert rb == expected_b
-
-
-"""
-TODO:
-Negated plane example:
-
-      ^ Z                                ^ Z
-      |   123                      321   |
-      |   456  789            987  654   |
-      |_____________> Y  -Y <____________|
-     /                                  /
-    /                                  /
-   V X                                V X
-"""

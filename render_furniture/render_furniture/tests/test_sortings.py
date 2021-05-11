@@ -22,7 +22,7 @@ def geometries():
 
 
 def _rectangles(geometry, plane):
-    return list(map(lambda g: _geometry2rectangle(plane=plane, geometry=g), geometry))
+    return [_geometry2rectangle(plane=plane, geometry=g) for g in geometry]
 
 
 @pytest.mark.parametrize(
@@ -36,14 +36,16 @@ def _rectangles(geometry, plane):
         (PlaneChoices.YZ_rev, x_far, x_close),
     ],
 )
-def test_sorting(plane, expected_closest, expected_farest, geometries):
+def test_rectangles_are_sorted_in_descending_order_by_their_depth_depending_on_the_chosen_plane(
+    plane, expected_closest, expected_farest, geometries
+):
     s = _sorted_rectangles(_rectangles(geometries, plane=plane))
 
     assert s[0] == _geometry2rectangle(geometry=expected_closest, plane=plane)
     assert s[-1] == _geometry2rectangle(geometry=expected_farest, plane=plane)
 
 
-def test_sort_rectangles():
+def test_rectangles_are_sorted_in_ascending_order_by_their_depth_in_normal_and_reversed_plane():
     a = Geometry(x1=1, x2=2, y1=1, y2=2, z1=1, z2=2)
     b = Geometry(x1=11, x2=12, y1=1, y2=2, z1=1, z2=2)
     c = Geometry(x1=21, x2=22, y1=1, y2=2, z1=1, z2=2)

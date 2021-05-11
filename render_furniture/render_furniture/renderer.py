@@ -35,7 +35,7 @@ class PlaneDescription(BaseModel):
 
 """
 Based on the delivered input example, the
-axes were adjuted to generate furniture in the correct orientation from the perspective of the user. This means that
+axes were adjusted to generate furniture in the correct orientation from the perspective of the user. This means that
 furniture is visualized as it's standing on its base, not on its side.
 
 :param plane: PlaneChoices Enum object which should be translated.
@@ -72,7 +72,7 @@ _AXES_BY_PLANE = {
         y_axis=AxisDescription(name="z", negated=True),
         depth_axis=AxisDescription(name="y", negated=True),
     ),
-}.get
+}
 
 
 def _get_coordinate_and_length(geometry: Geometry, axis: AxisDescription) -> Tuple[int, int]:
@@ -102,7 +102,7 @@ def _geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     if not isinstance(plane, PlaneChoices):
         raise TypeError("plane must be a PlaneChoices enum instance")
 
-    plane_description = _AXES_BY_PLANE(plane)
+    plane_description = _AXES_BY_PLANE[plane]
 
     x, width = _get_coordinate_and_length(geometry=geometry, axis=plane_description.x_axis)
     y, height = _get_coordinate_and_length(geometry=geometry, axis=plane_description.y_axis)
@@ -134,33 +134,33 @@ def _is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     if not top_rect.depth > bottom_rect.depth:
         return False
 
-    return all(
-        (
-            top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width),
-            top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width),
-            top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height),
-            top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height),
-        )
+    return (
+        top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width)
+        and top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width)
+        and top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height)
+        and top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height)
     )
 
 
 def _remove_overlapped(rectangles: List[Rectangle]) -> List[Rectangle]:
-    """The method removes objects fully overlapped by others to potentially speed up rendering.
+    """The method removes objects fully overlapped by others to potentially speed up rendering and decrease output SVG
+    file size.
 
-    Warning: This method only removes rectangles fully shadowed by other rectangle. This method do not remove rectangle
-    fully shadowed by multiple other rectangles, but not fully by one of them
+    Warning: This method only removes rectangles fully obscured by another single rectangle. This method does not remove
+    rectangle fully shadowed by multiple other rectangles, but not fully by one of them
 
     DISCLAIMER:
-    Since this removal is not crucial for resulting SVG output (This removal was introduced only to be used for
-    speed up potentially slowly precessing of multiple figures during render) - I decided to skip that part.
+    Since this removal is not crucial for resulting SVG output (This removal was introduced only to be used for speed up
+    potentially slowly precessing of multiple figures during render) - I decided to skip the case described in the above
+    warning but I am aware of it.
     """
     sorted_rects = _sorted_rectangles(rectangles)
-    not_shadowed = [sorted_rects[0]]
+    not_overlapped = [sorted_rects[0]]
     for current_rect in sorted_rects[1:]:
-        if all(not _is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_shadowed):
-            not_shadowed.append(current_rect)
+        if all(not _is_shadowed(top_rect=r, bottom_rect=current_rect) for r in not_overlapped):
+            not_overlapped.append(current_rect)
 
-    return not_shadowed
+    return not_overlapped
 
 
 AxisRanges = namedtuple("AxisRanges", "x_min, x_max, y_min, y_max, depth_min, depth_max")
@@ -189,7 +189,7 @@ def _adjust_rectangles_position(
 
 
 def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
-    rectangles = list(map(lambda g: _geometry2rectangle(plane=plane, geometry=g), geometries))
+    rectangles = [_geometry2rectangle(plane=plane, geometry=g) for g in geometries]
     rectangles = _sorted_rectangles(rectangles)
     rectangles = _remove_overlapped(rectangles)
     rectangles.reverse()  # draw from far to the closest one

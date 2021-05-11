@@ -9,8 +9,6 @@ def original_example_input() -> dict:
     Note:
         fixtures scope set to function instead of session since the returned value is mutable.
         I do not want to be forced to making copies inside tests when I'm modifying something.
-
-    Perhaps I should Django's HttpRequest... but I decided to let that as-is for now.
     """
     return {
         "geometry": [
