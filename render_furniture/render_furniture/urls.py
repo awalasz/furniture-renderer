@@ -19,5 +19,5 @@ from django.views.decorators.csrf import csrf_exempt
 from render_furniture.views import RenderSVGView
 
 urlpatterns = [
-    path("projection", csrf_exempt(RenderSVGView.as_view()), name='RenderSVG'),
+    path("projection", csrf_exempt(RenderSVGView.as_view()), name="RenderSVG"),
 ]
