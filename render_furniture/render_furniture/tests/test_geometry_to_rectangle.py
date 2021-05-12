@@ -70,8 +70,8 @@ XZ plane:
 """
 import pytest
 
-from render_furniture.schemas import Geometry, PlaneChoices
 from render_furniture.renderer import Rectangle, _geometry2rectangle
+from render_furniture.schemas import Geometry, PlaneChoices
 
 A = Geometry(x1=1, y1=4, z1=2, x2=3, y2=8, z2=-1)
 B = Geometry(x1=12, y1=4, z1=2, x2=5, y2=6, z2=-3)

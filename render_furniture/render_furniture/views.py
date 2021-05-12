@@ -2,9 +2,8 @@ from django.http import HttpResponse
 from django.views import View
 from pydantic.error_wrappers import ValidationError
 
-from render_furniture.schemas import Body, PlaneChoices
-
 from render_furniture.renderer import render_svg
+from render_furniture.schemas import Body, PlaneChoices
 
 
 class RenderSVGView(View):

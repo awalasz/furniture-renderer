@@ -1,11 +1,12 @@
 """WIP
 - scratch.
 """
-
+import django
 import pytest
+from django.test import Client
 
-from render_furniture.schemas import Body, PlaneChoices
 from render_furniture.renderer import render_svg
+from render_furniture.schemas import Body, PlaneChoices
 
 
 @pytest.mark.parametrize("plane", list(PlaneChoices))
@@ -17,32 +18,27 @@ def test_body_schema(original_example_input, plane):
 
 
 @pytest.fixture()
-def rest_client():
-    return None  # todo - use DRF?
+def client():
+    django.setup()
+    return Client(SERVER_NAME='localhost')
 
 
 class TestProjectionsEndpoint:
-    def test_accepts_only_applications_json_content_type(self):
+
+    def test_produces_xml_svg_content(self, client, original_example_input):
+        response = client.post("/projection", original_example_input, content_type="application/json")
+        assert response.headers['Content-Type'] == "image/svg+xml"
+        assert response.status_code == 200
+
+    def test_produces_correct_output(self, client):  # Parametrize this with examples of correct output (only Regression tests?)
         raise NotImplemented()
 
-    def test_produces_xml_svg_content(self):
+    def test_produces_output_with_correct_number_of_rectangles_if_no_projections_overlap(self, client):
         raise NotImplemented()
 
-    def test_produces_correct_output(self):  # Parametrize this with examples of correct output (only Regression tests?)
+    def test_contains_only_rectangles_not_fully_obscured_by_other_rectangles(self, client):
         raise NotImplemented()
 
-    def test_produces_output_with_correct_number_of_rectangles_if_no_projections_overlap(self):
-        raise NotImplemented()
-
-    def test_contains_only_rectangles_not_fully_obscured_by_other_rectangles(self):
-        raise NotImplemented()
-
-    def test_returns_400_if_incorrect_input_is_provided(self):
-        raise NotImplemented()
-
-
-# @lru_cache()
-# def get_svg_renderer():
-#     renderer_path = GET_RENDERER_PATH_FROM_SETTINGS  # obtain settings in Django
-#     module, cls = renderer_path.rsplit(".", 1)
-#     return getattr(__import__(renderer_path), cls)()
+    def test_returns_400_if_incorrect_input_is_provided(self, client):
+        response = client.post("/projection", {"invalid": "schema"}, content_type="application/json")
+        assert response.status_code == 400

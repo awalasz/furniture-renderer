@@ -1,10 +1,7 @@
-# TODO:
-#  1. validation? Check if some Geometries has conflicts in space? Ignore for now.
-#  2. Optional - Normalized size of SVG? Then printing scale would be helpful
 from collections import namedtuple
 from typing import List, Tuple, Literal
-import drawSvg as draw
 
+import drawSvg as draw
 from pydantic import BaseModel
 
 from render_furniture.schemas import (

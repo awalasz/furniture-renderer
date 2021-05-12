@@ -1,4 +1,4 @@
 Django==3.2.2
 pydantic==1.8.1
 drawSvg==1.8.1
-gunicorn
+gunicorn==20.1.0
