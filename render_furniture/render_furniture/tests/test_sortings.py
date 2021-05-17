@@ -28,12 +28,12 @@ def _rectangles(geometry, plane):
 @pytest.mark.parametrize(
     "plane, expected_closest, expected_farest",
     [
-        (PlaneChoices.XY, z_close, z_far),
-        (PlaneChoices.XZ, y_close, y_far),
-        (PlaneChoices.YZ, x_close, x_far),
-        (PlaneChoices.XY_rev, z_far, z_close),
-        (PlaneChoices.XZ_rev, y_far, y_close),
-        (PlaneChoices.YZ_rev, x_far, x_close),
+        (PlaneChoices.X_Y, z_close, z_far),
+        (PlaneChoices.X_Z, y_close, y_far),
+        (PlaneChoices.Y_Z, x_close, x_far),
+        (PlaneChoices.NX_Y, z_far, z_close),
+        (PlaneChoices.NX_Z, y_far, y_close),
+        (PlaneChoices.NY_Z, x_far, x_close),
     ],
 )
 def test_rectangles_are_sorted_in_descending_order_by_their_depth_depending_on_the_chosen_plane(
@@ -50,13 +50,13 @@ def test_rectangles_are_sorted_in_ascending_order_by_their_depth_in_normal_and_r
     b = Geometry(x1=11, x2=12, y1=1, y2=2, z1=1, z2=2)
     c = Geometry(x1=21, x2=22, y1=1, y2=2, z1=1, z2=2)
 
-    rectangles = _rectangles([b, a, c], plane=PlaneChoices.YZ)
+    rectangles = _rectangles([b, a, c], plane=PlaneChoices.Y_Z)
     sorted_rect = _sorted_rectangles(rectangles=rectangles)
     assert sorted_rect[0].depth == 22
     assert sorted_rect[1].depth == 12
     assert sorted_rect[2].depth == 2
 
-    rev_plane_rectangles = _rectangles([b, a, c], plane=PlaneChoices.YZ_rev)
+    rev_plane_rectangles = _rectangles([b, a, c], plane=PlaneChoices.NY_Z)
     rev_sorted_rect = _sorted_rectangles(rectangles=rev_plane_rectangles)
     assert rev_sorted_rect[0].depth == -1
     assert rev_sorted_rect[1].depth == -11

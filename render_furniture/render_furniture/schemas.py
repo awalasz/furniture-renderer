@@ -5,13 +5,13 @@ from pydantic import BaseModel, Extra
 
 
 class PlaneChoices(Enum):
-    XY = "XY"
-    YZ = "YZ"
-    XZ = "XZ"
+    X_Y = "XY"
+    Y_Z = "YZ"
+    X_Z = "XZ"
 
-    XY_rev = "-XY"
-    YZ_rev = "-YZ"
-    XZ_rev = "-XZ"
+    NX_Y = "-XY"
+    NY_Z = "-YZ"
+    NX_Z = "-XZ"
 
 
 class Geometry(BaseModel, extra=Extra.forbid):

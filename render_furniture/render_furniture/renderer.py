@@ -15,7 +15,6 @@ class Rectangle(BaseModel):
     y: int
     width: int
     height: int
-
     depth: int
 
 
@@ -39,32 +38,32 @@ furniture is visualized as it's standing on its base, not on its side.
 :return: PlaneDescription tuple which transits 3D axes to given 2D Plane.
 """
 _AXES_BY_PLANE = {
-    PlaneChoices.XY: PlaneDescription(
+    PlaneChoices.X_Y: PlaneDescription(
         x_axis=AxisDescription(name="x"),
         y_axis=AxisDescription(name="y"),
         depth_axis=AxisDescription(name="z"),
     ),
-    PlaneChoices.YZ: PlaneDescription(
+    PlaneChoices.Y_Z: PlaneDescription(
         x_axis=AxisDescription(name="z", negated=True),
         y_axis=AxisDescription(name="y"),
         depth_axis=AxisDescription(name="x"),
     ),
-    PlaneChoices.XZ: PlaneDescription(
+    PlaneChoices.X_Z: PlaneDescription(
         x_axis=AxisDescription(name="x"),
         y_axis=AxisDescription(name="z", negated=True),
         depth_axis=AxisDescription(name="y"),
     ),
-    PlaneChoices.XY_rev: PlaneDescription(
+    PlaneChoices.NX_Y: PlaneDescription(
         x_axis=AxisDescription(name="x", negated=True),
         y_axis=AxisDescription(name="y"),
         depth_axis=AxisDescription(name="z", negated=True),
     ),
-    PlaneChoices.YZ_rev: PlaneDescription(
+    PlaneChoices.NY_Z: PlaneDescription(
         x_axis=AxisDescription(name="z"),
         y_axis=AxisDescription(name="y"),
         depth_axis=AxisDescription(name="x", negated=True),
     ),
-    PlaneChoices.XZ_rev: PlaneDescription(
+    PlaneChoices.NX_Z: PlaneDescription(
         x_axis=AxisDescription(name="x"),
         y_axis=AxisDescription(name="z", negated=True),
         depth_axis=AxisDescription(name="y", negated=True),
@@ -121,7 +120,8 @@ def _geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
 
 
 def _sorted_rectangles(rectangles: List[Rectangle]) -> List[Rectangle]:
-    """Method returns sorted list of rectangles in order from closest to the further one, based on it's height"""
+    """Method returns sorted list of rectangles in order from closest to the further one, based on it's depth (axis that
+    is perpendicular to the plane view"""
     return sorted(rectangles, key=lambda r: r.depth, reverse=True)
 
 

@@ -81,17 +81,17 @@ B = Geometry(x1=12, y1=4, z1=2, x2=5, y2=6, z2=-3)
     "plane, expected_a, expected_b",
     [
         (
-            PlaneChoices.XY,
+            PlaneChoices.X_Y,
             Rectangle(x=1, width=2, y=4, height=4, depth=2),
             Rectangle(x=5, width=7, y=4, height=2, depth=2),
         ),
         (
-            PlaneChoices.YZ,
+            PlaneChoices.Y_Z,
             Rectangle(x=-2, width=3, y=4, height=4, depth=3),
             Rectangle(x=-2, width=5, y=4, height=2, depth=12),
         ),
         (
-            PlaneChoices.XZ,
+            PlaneChoices.X_Z,
             Rectangle(x=1, width=2, y=-2, height=3, depth=8),
             Rectangle(x=5, width=7, y=-2, height=5, depth=6),
         ),
