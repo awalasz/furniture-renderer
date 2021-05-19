@@ -130,12 +130,12 @@ def _is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     if not top_rect.z > bottom_rect.z:
         return False
 
-    return (
-        top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width)
-        and top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width)
-        and top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height)
-        and top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height)
-    )
+    left_side_obstructed = top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width)
+    right_side_obstructed = top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width)
+    bottom_side_obstructed = top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height)
+    top_side_obstructed = top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height)
+
+    return all([left_side_obstructed, right_side_obstructed, bottom_side_obstructed, top_side_obstructed])
 
 
 def _remove_overlapped(rectangles: List[Rectangle]) -> List[Rectangle]:
@@ -190,10 +190,7 @@ def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
     def _normalize_shade(z, min_shade=150, max_shade=200):
         if ranges.z_min == ranges.z_max:
             return max_shade
-        return (
-            int((z - ranges.z_min) / (ranges.z_max - ranges.z_min) * (max_shade - min_shade))
-            + min_shade
-        )
+        return int((z - ranges.z_min) / (ranges.z_max - ranges.z_min) * (max_shade - min_shade)) + min_shade
 
     d = draw.Drawing(
         width + padding * 2,
