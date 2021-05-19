@@ -52,12 +52,12 @@ def test_rectangles_are_sorted_in_ascending_order_by_their_depth_in_normal_and_r
 
     rectangles = _rectangles([b, a, c], plane=PlaneChoices.Y_Z)
     sorted_rect = _sorted_rectangles(rectangles=rectangles)
-    assert sorted_rect[0].depth == 22
-    assert sorted_rect[1].depth == 12
-    assert sorted_rect[2].depth == 2
+    assert sorted_rect[0].z == 22
+    assert sorted_rect[1].z == 12
+    assert sorted_rect[2].z == 2
 
     rev_plane_rectangles = _rectangles([b, a, c], plane=PlaneChoices.NY_Z)
     rev_sorted_rect = _sorted_rectangles(rectangles=rev_plane_rectangles)
-    assert rev_sorted_rect[0].depth == -1
-    assert rev_sorted_rect[1].depth == -11
-    assert rev_sorted_rect[2].depth == -21
+    assert rev_sorted_rect[0].z == -1
+    assert rev_sorted_rect[1].z == -11
+    assert rev_sorted_rect[2].z == -21

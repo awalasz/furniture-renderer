@@ -26,8 +26,8 @@ def test_partially_shadowed():
     -5     +--------+
        0   5   10   15
     """
-    close = Rectangle(depth=10, x=0, width=10, y=0, height=10)
-    far = Rectangle(depth=0, x=5, width=10, y=-5, height=10)
+    close = Rectangle(z=10, x=0, width=10, y=0, height=10)
+    far = Rectangle(z=0, x=5, width=10, y=-5, height=10)
     assert _is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
@@ -38,8 +38,8 @@ def test_not_overlapped():
     x    x    |    |
     xxxxxx    +----+
     """
-    close = Rectangle(depth=10, x=0, width=5, y=0, height=10)
-    far = Rectangle(depth=0, x=10, width=5, y=0, height=10)
+    close = Rectangle(z=10, x=0, width=5, y=0, height=10)
+    far = Rectangle(z=0, x=10, width=5, y=0, height=10)
     assert _is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
@@ -51,8 +51,8 @@ def test_fully_shadowed():
     x  +--+ x
     xxxxxxxxx
     """
-    close = Rectangle(depth=10, x=0, width=15, y=0, height=15)
-    far = Rectangle(depth=0, x=5, width=5, y=5, height=10)
+    close = Rectangle(z=10, x=0, width=15, y=0, height=15)
+    far = Rectangle(z=0, x=5, width=5, y=5, height=10)
     assert _is_shadowed(top_rect=close, bottom_rect=far) is True
 
 
@@ -65,8 +65,8 @@ def test_smaller_over_big():
     +--------+
 
     """
-    close = Rectangle(depth=10, x=5, width=10, y=5, height=10)
-    far = Rectangle(depth=0, x=0, width=15, y=0, height=15)
+    close = Rectangle(z=10, x=5, width=10, y=5, height=10)
+    far = Rectangle(z=0, x=0, width=15, y=0, height=15)
     assert _is_shadowed(top_rect=close, bottom_rect=far) is False
 
 
@@ -79,8 +79,8 @@ def test_side_overlapping():
     xxxxxxxxxx
 
     """
-    close = Rectangle(depth=10, x=0, width=10, y=0, height=10)
-    far = Rectangle(depth=0, x=0, width=5, y=5, height=5)
+    close = Rectangle(z=10, x=0, width=10, y=0, height=10)
+    far = Rectangle(z=0, x=0, width=5, y=5, height=5)
     assert _is_shadowed(top_rect=close, bottom_rect=far) is True
 
 
@@ -100,10 +100,10 @@ def test_removing_fully_shadowed_rectangles():
     C       BBBBCBBBBB
     CCCCCCCCCCCCC
     """
-    a = Rectangle(depth=1, x=2, width=6, y=2, height=1)
-    b = Rectangle(depth=2, x=4, width=6, y=1, height=3)
-    c = Rectangle(depth=3, x=0, width=6, y=0, height=5)
-    d = Rectangle(depth=0, x=0, width=3, y=3, height=2)
+    a = Rectangle(z=1, x=2, width=6, y=2, height=1)
+    b = Rectangle(z=2, x=4, width=6, y=1, height=3)
+    c = Rectangle(z=3, x=0, width=6, y=0, height=5)
+    d = Rectangle(z=0, x=0, width=3, y=3, height=2)
     original_list = [a, b, c, d]
     res = _remove_overlapped(rectangles=original_list)
     assert res == [c, b, a]

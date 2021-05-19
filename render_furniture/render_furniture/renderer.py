@@ -11,11 +11,18 @@ from render_furniture.schemas import (
 
 
 class Rectangle(BaseModel):
+    """
+    The model represents 2D figure projection to a plane. The `x` and `y` attributes point to the lower-left corner of
+    the projected rectangle. "Z" attribute is used to determine whether a rectangle is closer or farther to the "camera
+    point" and is used for example to check if a given rectangle is obstructed by another. Z Is also used for sorting
+    purposes.
+    """
+
     x: int
     y: int
     width: int
     height: int
-    depth: int
+    z: int
 
 
 class AxisDescription(BaseModel):
@@ -26,47 +33,41 @@ class AxisDescription(BaseModel):
 class PlaneDescription(BaseModel):
     x_axis: AxisDescription
     y_axis: AxisDescription
-    depth_axis: AxisDescription
+    z_axis: AxisDescription
 
 
-"""
-Based on the delivered input example, the
-axes were adjusted to generate furniture in the correct orientation from the perspective of the user. This means that
-furniture is visualized as it's standing on its base, not on its side.
-
-:param plane: PlaneChoices Enum object which should be translated.
-:return: PlaneDescription tuple which transits 3D axes to given 2D Plane.
-"""
+# Based on the delivered input example, the axes were adjusted to generate furniture in the correct orientation from the
+# perspective of the user. This means that furniture is visualized as it's standing on its base, not on its side.
 _AXES_BY_PLANE = {
     PlaneChoices.X_Y: PlaneDescription(
         x_axis=AxisDescription(name="x"),
         y_axis=AxisDescription(name="y"),
-        depth_axis=AxisDescription(name="z"),
+        z_axis=AxisDescription(name="z"),
     ),
     PlaneChoices.Y_Z: PlaneDescription(
         x_axis=AxisDescription(name="z", negated=True),
         y_axis=AxisDescription(name="y"),
-        depth_axis=AxisDescription(name="x"),
+        z_axis=AxisDescription(name="x"),
     ),
     PlaneChoices.X_Z: PlaneDescription(
         x_axis=AxisDescription(name="x"),
         y_axis=AxisDescription(name="z", negated=True),
-        depth_axis=AxisDescription(name="y"),
+        z_axis=AxisDescription(name="y"),
     ),
     PlaneChoices.NX_Y: PlaneDescription(
         x_axis=AxisDescription(name="x", negated=True),
         y_axis=AxisDescription(name="y"),
-        depth_axis=AxisDescription(name="z", negated=True),
+        z_axis=AxisDescription(name="z", negated=True),
     ),
     PlaneChoices.NY_Z: PlaneDescription(
         x_axis=AxisDescription(name="z"),
         y_axis=AxisDescription(name="y"),
-        depth_axis=AxisDescription(name="x", negated=True),
+        z_axis=AxisDescription(name="x", negated=True),
     ),
     PlaneChoices.NX_Z: PlaneDescription(
         x_axis=AxisDescription(name="x"),
         y_axis=AxisDescription(name="z", negated=True),
-        depth_axis=AxisDescription(name="y", negated=True),
+        z_axis=AxisDescription(name="y", negated=True),
     ),
 }
 
@@ -103,10 +104,10 @@ def _geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     x, width = _get_coordinate_and_length(geometry=geometry, axis=plane_description.x_axis)
     y, height = _get_coordinate_and_length(geometry=geometry, axis=plane_description.y_axis)
 
-    depth_1, depth_2 = getattr(geometry, plane_description.depth_axis.name + "1"), getattr(
-        geometry, plane_description.depth_axis.name + "2"
+    depth_1, depth_2 = getattr(geometry, plane_description.z_axis.name + "1"), getattr(
+        geometry, plane_description.z_axis.name + "2"
     )
-    if plane_description.depth_axis.negated:
+    if plane_description.z_axis.negated:
         depth_1, depth_2 = -depth_1, -depth_2
     depth = max(depth_1, depth_2)
 
@@ -115,20 +116,20 @@ def _geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
         y=y,
         width=width,
         height=height,
-        depth=depth,
+        z=depth,
     )
 
 
 def _sorted_rectangles(rectangles: List[Rectangle]) -> List[Rectangle]:
     """Method returns sorted list of rectangles in order from closest to the further one, based on it's depth (axis that
     is perpendicular to the plane view"""
-    return sorted(rectangles, key=lambda r: r.depth, reverse=True)
+    return sorted(rectangles, key=lambda r: r.z, reverse=True)
 
 
 def _is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     """returns True if the "top_rect" fully overlaps a bottom_rect"""
     # sanity check:
-    if not top_rect.depth > bottom_rect.depth:
+    if not top_rect.z > bottom_rect.z:
         return False
 
     return (
@@ -169,8 +170,8 @@ def _get_axis_range(rectangles: List[Rectangle]) -> AxisRanges:
         x_max=max(rect.x + rect.width for rect in rectangles),
         y_min=min(rect.y for rect in rectangles),
         y_max=max(rect.y + rect.height for rect in rectangles),
-        depth_min=min(rect.depth for rect in rectangles),
-        depth_max=max(rect.depth for rect in rectangles),
+        depth_min=min(rect.z for rect in rectangles),
+        depth_max=max(rect.z for rect in rectangles),
     )
 
 
@@ -200,9 +201,13 @@ def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
             + min_shade
         )
 
-    d = draw.Drawing(width + padding * 2, height + padding * 2, origin=(ranges.x_min - padding, ranges.y_min - padding))
+    d = draw.Drawing(
+        width + padding * 2,
+        height + padding * 2,
+        origin=(ranges.x_min - padding, ranges.y_min - padding),
+    )
     for rectangle in rectangles:
-        shade = _normalize_shade(rectangle.depth)
+        shade = _normalize_shade(rectangle.z)
         r = draw.Rectangle(
             rectangle.x,
             rectangle.y,
