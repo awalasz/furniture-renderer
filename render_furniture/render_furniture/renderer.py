@@ -174,17 +174,6 @@ def _get_axis_range(rectangles: List[Rectangle]) -> AxisRanges:
     )
 
 
-def _adjust_rectangles_position(
-    rectangles: List[Rectangle], ranges: AxisRanges, padding: int, inplace=True
-) -> List[Rectangle]:
-    if not inplace:
-        rectangles = rectangles[:]
-    for rectangle in rectangles:
-        rectangle.x -= ranges.x_min - padding
-        rectangle.y -= ranges.y_min - padding
-    return rectangles if not inplace else None
-
-
 def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
     rectangles = [_geometry2rectangle(plane=plane, geometry=g) for g in geometries]
     rectangles = _sorted_rectangles(rectangles)
@@ -199,8 +188,6 @@ def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
     padding = int(0.1 * max(width, height))
     stroke_width = max(1, (0.001 * min(width, height)))
 
-    _adjust_rectangles_position(rectangles=rectangles, ranges=ranges, padding=padding)
-
     def _normalize_shade(depth, min_shade=150, max_shade=200):
         if ranges.depth_min == ranges.depth_max:
             return max_shade
@@ -213,7 +200,7 @@ def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
             + min_shade
         )
 
-    d = draw.Drawing(width + padding * 2, height + padding * 2)
+    d = draw.Drawing(width + padding * 2, height + padding * 2, origin=(ranges.x_min - padding, ranges.y_min - padding))
     for rectangle in rectangles:
         shade = _normalize_shade(rectangle.depth)
         r = draw.Rectangle(
