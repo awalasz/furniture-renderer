@@ -31,8 +31,8 @@ I was curious how the furniture will look from the back. To check that I decided
 
 This leads me to the conclusion that furniture like this from the example input, when cast to 2D would look exactly the 
 same from both front and back because the same geometries are visible and are almost symmetric. 
-I decided to use depth that could be easily calculated and use it to make the closer figures bright, and those which are 
-from the back - darker. 
+I decided to use depth (the z-axis perpendicular to the given plane) that could be easily calculated and use it to make 
+the closer figures bright, and those which are from the back - darker. 
 
 Front (XY plane)           |  Back (-XY plane)
 :-------------------------:|:-------------------------:
@@ -61,7 +61,7 @@ adding the collective area of them to the condition used to determine whenever f
 
 To sum it up, additional features are:
 - removing obscured geometries,
-- shading of the geometry based on its depth,
+- shading of the geometry based on its z-index,
 - negated planes allowing to see the furniture from the other side.
 
 # Example usage:

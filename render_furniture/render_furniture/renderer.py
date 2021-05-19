@@ -92,7 +92,7 @@ def _geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
                /
               V Z
 
-    :param geometry: Geometry object to be casted to flat rectangle with depth property
+    :param geometry: Geometry object to be casted to flat rectangle with "z" property
     :param plane: plane to which geometry will be casted
     :return: "flat" Rectangle object with height property
     """
@@ -104,25 +104,23 @@ def _geometry2rectangle(geometry: Geometry, plane: PlaneChoices) -> Rectangle:
     x, width = _get_coordinate_and_length(geometry=geometry, axis=plane_description.x_axis)
     y, height = _get_coordinate_and_length(geometry=geometry, axis=plane_description.y_axis)
 
-    depth_1, depth_2 = getattr(geometry, plane_description.z_axis.name + "1"), getattr(
-        geometry, plane_description.z_axis.name + "2"
-    )
+    z1 = getattr(geometry, plane_description.z_axis.name + "1")
+    z2 = getattr(geometry, plane_description.z_axis.name + "2")
     if plane_description.z_axis.negated:
-        depth_1, depth_2 = -depth_1, -depth_2
-    depth = max(depth_1, depth_2)
+        z1, z2 = -z1, -z2
 
     return Rectangle(
         x=x,
         y=y,
         width=width,
         height=height,
-        z=depth,
+        z=max(z1, z2),
     )
 
 
 def _sorted_rectangles(rectangles: List[Rectangle]) -> List[Rectangle]:
-    """Method returns sorted list of rectangles in order from closest to the further one, based on it's depth (axis that
-    is perpendicular to the plane view"""
+    """Method returns sorted list of rectangles in order from closest to the further one, based on it's "z" attribute
+    (axis that is perpendicular to the plane view"""
     return sorted(rectangles, key=lambda r: r.z, reverse=True)
 
 
@@ -161,7 +159,7 @@ def _remove_overlapped(rectangles: List[Rectangle]) -> List[Rectangle]:
     return not_overlapped
 
 
-AxisRanges = namedtuple("AxisRanges", "x_min, x_max, y_min, y_max, depth_min, depth_max")
+AxisRanges = namedtuple("AxisRanges", "x_min, x_max, y_min, y_max, z_min, z_max")
 
 
 def _get_axis_range(rectangles: List[Rectangle]) -> AxisRanges:
@@ -170,8 +168,8 @@ def _get_axis_range(rectangles: List[Rectangle]) -> AxisRanges:
         x_max=max(rect.x + rect.width for rect in rectangles),
         y_min=min(rect.y for rect in rectangles),
         y_max=max(rect.y + rect.height for rect in rectangles),
-        depth_min=min(rect.z for rect in rectangles),
-        depth_max=max(rect.z for rect in rectangles),
+        z_min=min(rect.z for rect in rectangles),
+        z_max=max(rect.z for rect in rectangles),
     )
 
 
@@ -189,15 +187,11 @@ def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
     padding = int(0.1 * max(width, height))
     stroke_width = max(1, (0.001 * min(width, height)))
 
-    def _normalize_shade(depth, min_shade=150, max_shade=200):
-        if ranges.depth_min == ranges.depth_max:
+    def _normalize_shade(z, min_shade=150, max_shade=200):
+        if ranges.z_min == ranges.z_max:
             return max_shade
         return (
-            int(
-                (depth - ranges.depth_min)
-                / (ranges.depth_max - ranges.depth_min)
-                * (max_shade - min_shade)
-            )
+            int((z - ranges.z_min) / (ranges.z_max - ranges.z_min) * (max_shade - min_shade))
             + min_shade
         )
 
