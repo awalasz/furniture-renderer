@@ -24,6 +24,14 @@ class Rectangle(BaseModel):
     height: int
     z: int
 
+    @property
+    def x_right(self):
+        return self.x + self.width
+
+    @property
+    def y_top(self):
+        return self.y + self.height
+
 
 class AxisDescription(BaseModel):
     name: Literal["x", "y", "z"]
@@ -130,10 +138,10 @@ def _is_shadowed(top_rect: Rectangle, bottom_rect: Rectangle):
     if not top_rect.z > bottom_rect.z:
         return False
 
-    left_side_obstructed = top_rect.x <= bottom_rect.x <= (top_rect.x + top_rect.width)
-    right_side_obstructed = top_rect.x <= (bottom_rect.x + bottom_rect.width) <= (top_rect.x + top_rect.width)
-    bottom_side_obstructed = top_rect.y <= bottom_rect.y <= (top_rect.y + top_rect.height)
-    top_side_obstructed = top_rect.y <= (bottom_rect.y + bottom_rect.height) <= (top_rect.y + top_rect.height)
+    left_side_obstructed = top_rect.x <= bottom_rect.x <= top_rect.x_right
+    right_side_obstructed = top_rect.x <= bottom_rect.x_right <= top_rect.x_right
+    bottom_side_obstructed = top_rect.y <= bottom_rect.y <= top_rect.y_top
+    top_side_obstructed = top_rect.y <= bottom_rect.y_top <= top_rect.y_top
 
     return all([left_side_obstructed, right_side_obstructed, bottom_side_obstructed, top_side_obstructed])
 
@@ -163,21 +171,27 @@ AxisRanges = namedtuple("AxisRanges", "x_min, x_max, y_min, y_max, z_min, z_max"
 
 
 def _get_axis_range(rectangles: List[Rectangle]) -> AxisRanges:
-    return AxisRanges(
-        x_min=min(rect.x for rect in rectangles),
-        x_max=max(rect.x + rect.width for rect in rectangles),
-        y_min=min(rect.y for rect in rectangles),
-        y_max=max(rect.y + rect.height for rect in rectangles),
-        z_min=min(rect.z for rect in rectangles),
-        z_max=max(rect.z for rect in rectangles),
-    )
+    """Calculates the most outer coordinates to determine the correct SVG view box"""
+    x_min = rectangles[0].x
+    x_max = rectangles[0].x_right
+    y_min = rectangles[0].y
+    y_max = rectangles[0].y_top
+    z_min = z_max = rectangles[0].z
+    for rectangle in rectangles[1:]:
+        x_min = min(rectangle.x, x_min)
+        x_max = max(rectangle.x_right, x_max)
+        y_min = min(rectangle.y, y_min)
+        y_max = max(rectangle.y_top, y_max)
+        z_min = min(rectangle.z, z_min)
+        z_max = max(rectangle.z, z_max)
+
+    return AxisRanges(x_min=x_min, x_max=x_max, y_min=y_min, y_max=y_max, z_min=z_min, z_max=z_max)
 
 
 def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
     rectangles = [_geometry2rectangle(plane=plane, geometry=g) for g in geometries]
     rectangles = _sorted_rectangles(rectangles)
     rectangles = _remove_overlapped(rectangles)
-    rectangles.reverse()  # draw from far to the closest one
 
     ranges = _get_axis_range(rectangles)
 
@@ -197,7 +211,7 @@ def render_svg(geometries: List[Geometry], plane: PlaneChoices) -> str:
         height + padding * 2,
         origin=(ranges.x_min - padding, ranges.y_min - padding),
     )
-    for rectangle in rectangles:
+    for rectangle in reversed(rectangles):
         shade = _normalize_shade(rectangle.z)
         r = draw.Rectangle(
             rectangle.x,
